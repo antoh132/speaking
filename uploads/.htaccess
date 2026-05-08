@@ -1,0 +1,13 @@
+# Prevent directory listing
+Options -Indexes
+
+# Only allow audio file types to be served
+<FilesMatch "\.(webm|mp3|ogg|wav)$">
+    Allow from all
+</FilesMatch>
+
+# Block everything else
+<FilesMatch "^(?!.*\.(webm|mp3|ogg|wav)$)">
+    Order deny,allow
+    Deny from all
+</FilesMatch>

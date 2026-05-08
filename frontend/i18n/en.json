@@ -1,0 +1,212 @@
+{
+  "app": {
+    "name": "SpeakOn!",
+    "tagline": "English Language Learning Platform"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Login",
+    "loggingIn": "Logging in...",
+    "forgotPassword": "Forgot password?",
+    "loginSuccess": "Login successful! Redirecting...",
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "accountLocked": "Account temporarily locked. Try again after {minutes} minutes.",
+      "accountInactive": "Your account has been deactivated. Contact your administrator.",
+      "tokenExpired": "Your session has expired. Please log in again.",
+      "networkError": "Failed to connect to server. Check your internet connection."
+    }
+  },
+  "dashboard": {
+    "superadmin": {
+      "title": "Super Admin Dashboard",
+      "stats": {
+        "totalUsers": "Total Users",
+        "activeSessions": "Active Sessions",
+        "pendingTasks": "Pending Tasks",
+        "totalDosen": "Total Lecturers",
+        "totalSiswa": "Total Students"
+      },
+      "sections": {
+        "userManagement": "User Management",
+        "auditLog": "Audit Log",
+        "activeSessions": "Active Sessions",
+        "recentActivity": "Recent Activity"
+      }
+    },
+    "dosen": {
+      "title": "Lecturer Dashboard",
+      "sections": {
+        "pendingReviews": "Recordings Pending Review",
+        "recentFeedback": "Recent Feedback"
+      }
+    },
+    "siswa": {
+      "title": "Student Dashboard",
+      "sections": {
+        "progress": "My Progress",
+        "notifications": "Notifications",
+        "levels": "Levels"
+      }
+    }
+  },
+  "users": {
+    "createUser": "Create User",
+    "editUser": "Edit User",
+    "deactivateUser": "Deactivate User",
+    "fullName": "Full Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "roles": {
+      "superadmin": "Super Admin",
+      "dosen": "Lecturer",
+      "siswa": "Student"
+    },
+    "tempPassword": "Temporary Password",
+    "tempPasswordNote": "Save this password. The user must change it on first login.",
+    "confirmDeactivate": "Are you sure you want to deactivate this user?",
+    "errors": {
+      "emailExists": "Email is already registered.",
+      "userNotFound": "User not found."
+    }
+  },
+  "levels": {
+    "level": "Level",
+    "status": {
+      "locked": "Locked",
+      "active": "Active",
+      "passed": "Passed"
+    },
+    "progress": "Progress",
+    "progressPercent": "{percent}% Complete",
+    "unlockMessage": "Congratulations! Level {level} is now unlocked.",
+    "lockedMessage": "Complete Level {prev} first to unlock this level.",
+    "materials": "Level Materials"
+  },
+  "recordings": {
+    "upload": "Upload Recording",
+    "uploading": "Uploading...",
+    "uploadSuccess": "Recording uploaded successfully.",
+    "record": "Record",
+    "stop": "Stop",
+    "play": "Play",
+    "pause": "Pause",
+    "duration": "Duration",
+    "fileSize": "File Size",
+    "uploadedAt": "Uploaded at",
+    "errors": {
+      "fileTooLarge": "File size exceeds the 50 MB limit.",
+      "invalidType": "Unsupported file format. Use webm, mp3, ogg, or wav.",
+      "levelLocked": "This level is not yet unlocked."
+    }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "comment": "Comment",
+    "commentPlaceholder": "Write your feedback comment (minimum 10 characters)...",
+    "passStatus": "Assessment Status",
+    "lulus": "Pass",
+    "tidakLulus": "Fail",
+    "submitFeedback": "Submit Feedback",
+    "updateFeedback": "Update Feedback",
+    "submitting": "Submitting...",
+    "submitSuccess": "Feedback submitted successfully.",
+    "givenBy": "Given by",
+    "givenAt": "Given at",
+    "errors": {
+      "commentTooShort": "Comment must be at least 10 characters.",
+      "invalidStatus": "Invalid assessment status."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No notifications.",
+    "markAsRead": "Mark as Read",
+    "markAllRead": "Mark All as Read",
+    "unread": "Unread",
+    "read": "Read",
+    "newFeedback": "You received new feedback from {dosen} for Level {level}.",
+    "levelUnlocked": "Congratulations! Level {level} is now unlocked."
+  },
+  "audit": {
+    "title": "Audit Log",
+    "export": "Export CSV",
+    "filters": {
+      "dateFrom": "From Date",
+      "dateTo": "To Date",
+      "user": "User",
+      "action": "Action",
+      "search": "Search"
+    },
+    "columns": {
+      "timestamp": "Timestamp",
+      "user": "User",
+      "role": "Role",
+      "action": "Action",
+      "entity": "Entity",
+      "ip": "IP Address"
+    },
+    "actions": {
+      "login": "Login",
+      "logout": "Logout",
+      "login_failed": "Login Failed",
+      "account_locked": "Account Locked",
+      "user_created": "User Created",
+      "user_updated": "User Updated",
+      "user_deactivated": "User Deactivated",
+      "recording_uploaded": "Recording Uploaded",
+      "feedback_given": "Feedback Given",
+      "feedback_updated": "Feedback Updated",
+      "level_unlocked": "Level Unlocked",
+      "notification_sent": "Notification Sent",
+      "notification_read": "Notification Read",
+      "audit_log_exported": "Audit Log Exported"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "loading": "Loading...",
+    "noData": "No data available.",
+    "error": "An error occurred.",
+    "success": "Success.",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "page": "Page",
+    "of": "of",
+    "rows": "rows",
+    "language": "Language"
+  },
+  "errors": {
+    "404": "Page not found.",
+    "403": "You do not have permission to access this page.",
+    "500": "An internal server error occurred.",
+    "networkError": "Failed to connect to server."
+  }
+}

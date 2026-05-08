@@ -1,0 +1,26 @@
+<?php
+/**
+ * SpeakOn! — Local/Production Config Override
+ *
+ * CARA PAKAI:
+ * 1. Copy file ini menjadi: api/config/config.local.php
+ * 2. Isi dengan credentials dari InfinityFree
+ * 3. JANGAN commit file config.local.php ke GitHub
+ *
+ * Di InfinityFree, nama database formatnya: username_namadb
+ * Contoh: epiz_12345678_speakon_db
+ */
+
+// ── Database InfinityFree ─────────────────────────────────────────────────────
+// Dapatkan info ini dari: cPanel → MySQL Databases
+define('DB_HOST', 'sql200.infinityfree.com'); // ganti sesuai info di cPanel
+define('DB_NAME', 'epiz_XXXXXXXX_speakon');   // ganti dengan nama database kamu
+define('DB_USER', 'epiz_XXXXXXXX_speakon');   // ganti dengan username database
+define('DB_PASS', 'password_database_kamu');  // ganti dengan password database
+
+// ── JWT Secret (WAJIB diganti untuk production) ───────────────────────────────
+define('JWT_SECRET',         'ganti_dengan_32_karakter_acak_yang_kuat_1234567890ab');
+define('JWT_REFRESH_SECRET', 'ganti_dengan_32_karakter_acak_berbeda_0987654321cd');
+
+// ── Environment ───────────────────────────────────────────────────────────────
+define('APP_ENV', 'production');

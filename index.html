@@ -1,244 +1,737 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SpeakOn! - English Speaking Practice</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  </head>
-  <body>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpeakOn! — Platform Pembelajaran Bahasa Inggris</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- ── NAVBAR ── -->
-    <nav class="navbar">
-      <div class="nav-logo">🎙️ SpeakOn!</div>
-      <div class="nav-links" id="nav-links">
-        <button class="nav-btn active" onclick="showPage('home')">🏠 Home</button>
-        <button class="nav-btn" onclick="showPage('topics')">📚 Topics</button>
-        <button class="nav-btn" onclick="showPage('practice')">✍️ Practice</button>
-        <button class="nav-btn" onclick="showPage('record')">🎤 Record</button>
-        <button class="nav-btn" onclick="showPage('scenario')">🎭 Scenario</button>
-      </div>
-    </nav>
+    :root {
+      --blue:   #1a73e8;
+      --blue2:  #0d47a1;
+      --green:  #43a047;
+      --dark:   #1a1a2e;
+      --gray:   #f0f4f8;
+      --white:  #ffffff;
+      --text:   #2d2d2d;
+      --muted:  #666;
+    }
 
-    <!-- ══════════════════════════════════════════
-         PAGE: HOME
-    ══════════════════════════════════════════ -->
-    <div id="page-home" class="page active">
-      <section class="hero">
-        <div class="hero-content">
-          <h1>Welcome to <span class="brand">SpeakOn!</span></h1>
-          <p class="hero-sub">A voice-based English speaking practice platform for Senior High School students. Build your confidence, vocabulary, and fluency — step by step.</p>
-          <button class="btn-primary" onclick="showPage('topics')">Start Practicing →</button>
-        </div>
-        <div class="hero-illustration">🗣️</div>
-      </section>
+    html { scroll-behavior: smooth; }
 
-      <section class="features-overview">
-        <h2>What You Can Do</h2>
-        <div class="feature-cards">
-          <div class="feature-card" onclick="showPage('practice')">
-            <div class="feature-icon">🔊</div>
-            <h3>Listen & Repeat</h3>
-            <p>Hear audio models and dialogue samples, then practice pronunciation and intonation.</p>
-          </div>
-          <div class="feature-card" onclick="showPage('practice')">
-            <div class="feature-icon">✍️</div>
-            <h3>Guided Tasks</h3>
-            <p>Complete structured speaking tasks from simple prompts to open responses.</p>
-          </div>
-          <div class="feature-card" onclick="showPage('record')">
-            <div class="feature-icon">🎤</div>
-            <h3>Record Yourself</h3>
-            <p>Record your voice, listen back, and improve your speaking accuracy.</p>
-          </div>
-          <div class="feature-card" onclick="showPage('scenario')">
-            <div class="feature-icon">🎭</div>
-            <h3>Real Scenarios</h3>
-            <p>Practice speaking in real-life situations to build communicative competence.</p>
-          </div>
-        </div>
-      </section>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--white);
+      color: var(--text);
+    }
 
-      <section class="how-to">
-        <h2>How to Use SpeakOn!</h2>
-        <div class="steps">
-          <div class="step"><span class="step-num">1</span><p>Choose a <strong>Topic</strong></p></div>
-          <div class="step-arrow">→</div>
-          <div class="step"><span class="step-num">2</span><p><strong>Listen</strong> to audio models</p></div>
-          <div class="step-arrow">→</div>
-          <div class="step"><span class="step-num">3</span><p>Do <strong>Guided Tasks</strong></p></div>
-          <div class="step-arrow">→</div>
-          <div class="step"><span class="step-num">4</span><p><strong>Record</strong> your voice</p></div>
-          <div class="step-arrow">→</div>
-          <div class="step"><span class="step-num">5</span><p>Try <strong>Scenarios</strong></p></div>
-        </div>
-      </section>
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+      height: 68px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+      font-size: .92rem;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover { color: var(--blue); }
+
+    .btn-login {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: .55rem 1.4rem;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+      display: inline-block;
+    }
+
+    .btn-login:hover {
+      background: var(--blue2);
+      transform: translateY(-1px);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: .4rem;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2.5px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: .3s;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 60%, #1a1a2e 100%);
+      color: #fff;
+      padding: 6rem 5% 5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3rem;
+      min-height: 88vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: rgba(255,255,255,.04);
+      border-radius: 50%;
+      top: -200px;
+      right: -100px;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255,255,255,.04);
+      border-radius: 50%;
+      bottom: -150px;
+      left: -100px;
+    }
+
+    .hero-content {
+      max-width: 580px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      padding: .3rem .9rem;
+      font-size: .8rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      letter-spacing: .5px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 span {
+      color: #ffd54f;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      opacity: .88;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      max-width: 480px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      background: #fff;
+      color: var(--blue);
+      border: none;
+      border-radius: 10px;
+      padding: .85rem 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      display: inline-block;
+    }
+
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    }
+
+    .btn-hero-outline {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,.6);
+      border-radius: 10px;
+      padding: .85rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s, border-color .2s;
+      display: inline-block;
+    }
+
+    .btn-hero-outline:hover {
+      background: rgba(255,255,255,.1);
+      border-color: #fff;
+    }
+
+    .hero-visual {
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    .hero-card {
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 320px;
+      text-align: center;
+    }
+
+    .hero-card .big-icon { font-size: 5rem; margin-bottom: 1rem; }
+
+    .hero-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    .hero-card p {
+      font-size: .85rem;
+      opacity: .8;
+      margin-bottom: 0;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+      justify-content: center;
+    }
+
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 1.5rem; font-weight: 800; color: #ffd54f; }
+    .hero-stat .lbl { font-size: .72rem; opacity: .8; }
+
+    /* ── ROLES SECTION ── */
+    .roles-section {
+      padding: 5rem 5%;
+      background: var(--gray);
+      text-align: center;
+    }
+
+    .section-label {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: .75rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: .75rem;
+      color: var(--dark);
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: .95rem;
+      max-width: 520px;
+      margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .role-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,.07);
+      transition: transform .2s, box-shadow .2s;
+      text-align: center;
+    }
+
+    .role-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.12);
+    }
+
+    .role-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .role-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: .6rem;
+      color: var(--dark);
+    }
+
+    .role-card p {
+      font-size: .87rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+    }
+
+    .role-tag {
+      display: inline-block;
+      padding: .3rem .85rem;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    .tag-admin  { background: #e3f2fd; color: #1565c0; }
+    .tag-dosen  { background: #f3e5f5; color: #6a1b9a; }
+    .tag-siswa  { background: #e8f5e9; color: #2e7d32; }
+
+    /* ── FEATURES ── */
+    .features-section {
+      padding: 5rem 5%;
+      background: #fff;
+    }
+
+    .features-section .inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .features-section .header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feat-card {
+      background: var(--gray);
+      border-radius: 14px;
+      padding: 1.75rem 1.5rem;
+      transition: background .2s;
+    }
+
+    .feat-card:hover { background: #e3f0ff; }
+
+    .feat-icon {
+      font-size: 2.2rem;
+      margin-bottom: .85rem;
+    }
+
+    .feat-card h4 {
+      font-size: .98rem;
+      font-weight: 700;
+      margin-bottom: .4rem;
+      color: var(--dark);
+    }
+
+    .feat-card p {
+      font-size: .84rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      padding: 5rem 5%;
+      background: var(--gray);
+    }
+
+    .how-section .inner {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .steps-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .step-item {
+      flex: 1;
+      min-width: 140px;
+      max-width: 180px;
+      text-align: center;
+      padding: 0 .5rem;
+    }
+
+    .step-num {
+      width: 52px;
+      height: 52px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin: 0 auto .85rem;
+    }
+
+    .step-item h4 {
+      font-size: .9rem;
+      font-weight: 700;
+      margin-bottom: .3rem;
+      color: var(--dark);
+    }
+
+    .step-item p {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .step-arrow {
+      font-size: 1.5rem;
+      color: #bbb;
+      padding-top: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 5rem 5%;
+      background: linear-gradient(135deg, #1a73e8, #0d47a1);
+      text-align: center;
+      color: #fff;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: .75rem;
+    }
+
+    .cta-section p {
+      font-size: 1rem;
+      opacity: .88;
+      margin-bottom: 2rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.6);
+      text-align: center;
+      padding: 2rem 5%;
+      font-size: .83rem;
+    }
+
+    footer strong { color: #fff; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 68px;
+        left: 0;
+        right: 0;
+        background: #fff;
+        padding: 1rem 5%;
+        box-shadow: 0 8px 24px rgba(0,0,0,.1);
+        gap: 1rem;
+        z-index: 99;
+      }
+      .hamburger { display: flex; }
+      .hero {
+        flex-direction: column;
+        padding: 4rem 5% 3rem;
+        min-height: auto;
+        text-align: center;
+      }
+      .hero-actions { justify-content: center; }
+      .hero-visual { display: none; }
+      .step-arrow { display: none; }
+      .steps-row { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <a href="#" class="nav-logo">🎙️ SpeakOn!</a>
+    <div class="nav-links" id="nav-links">
+      <a href="#tentang">Tentang</a>
+      <a href="#fitur">Fitur</a>
+      <a href="#cara-kerja">Cara Kerja</a>
+      <a href="login.html" class="btn-login">Masuk</a>
     </div>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
 
-    <!-- ══════════════════════════════════════════
-         PAGE: TOPICS
-    ══════════════════════════════════════════ -->
-    <div id="page-topics" class="page">
-      <div class="page-header">
-        <h1>Choose a Topic</h1>
-        <p>Select a topic to start your speaking practice session.</p>
-      </div>
-      <div class="topics-grid" id="topics-grid">
-        <!-- filled by JS -->
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🎓 Platform Pembelajaran Bahasa Inggris</div>
+      <h1>Tingkatkan <span>Kemampuan Speaking</span> Bahasa Inggrismu</h1>
+      <p>SpeakOn! adalah platform berbasis rekaman suara untuk siswa SMA. Latih pengucapan, intonasi, dan percakapan — lalu dapatkan feedback langsung dari dosen.</p>
+      <div class="hero-actions">
+        <a href="login.html" class="btn-hero-primary">🚀 Mulai Sekarang</a>
+        <a href="#cara-kerja" class="btn-hero-outline">Pelajari Lebih Lanjut</a>
       </div>
     </div>
-
-    <!-- ══════════════════════════════════════════
-         PAGE: PRACTICE (Audio Models + Guided Tasks)
-    ══════════════════════════════════════════ -->
-    <div id="page-practice" class="page">
-      <div class="page-header">
-        <h1>Practice</h1>
-        <p id="practice-topic-label">Select a topic first from the Topics page.</p>
-      </div>
-
-      <!-- Step 1: Audio Model -->
-      <section class="practice-section" id="section-audio">
-        <div class="section-badge">Step 1</div>
-        <h2>🔊 Listen to the Audio Model</h2>
-        <p class="section-desc">Listen carefully to the example sentence and dialogue. Pay attention to pronunciation and intonation.</p>
-
-        <div class="audio-model-box">
-          <div class="model-sentence" id="model-sentence">—</div>
-          <div class="speed-row">
-            <span class="speed-label">Speed:</span>
-            <button class="speed-btn active-speed" id="btn-speed-normal" onclick="setSpeed(0.9, this)">Normal</button>
-            <button class="speed-btn" id="btn-speed-slow" onclick="setSpeed(0.4, this)">Slow</button>
-            <button class="speed-btn" id="btn-speed-vslow" onclick="setSpeed(0.15, this)">Very Slow</button>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="big-icon">🗣️</div>
+        <h3>Rekam & Dapatkan Feedback</h3>
+        <p>Upload rekaman suaramu dan terima penilaian dari dosen secara langsung</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="num">5</div>
+            <div class="lbl">Level</div>
           </div>
-          <button class="btn-play" id="btn-play-model" onclick="playModel()">▶ Play Audio</button>
-        </div>
-
-        <div class="dialogue-box" id="dialogue-box">
-          <h3>💬 Sample Dialogue</h3>
-          <div id="dialogue-content">—</div>
-          <button class="btn-play-dialogue" onclick="playDialogue()">▶ Play Dialogue</button>
-        </div>
-      </section>
-
-      <!-- Step 2: Guided Tasks -->
-      <section class="practice-section" id="section-guided">
-        <div class="section-badge">Step 2</div>
-        <h2>✍️ Guided Speaking Tasks</h2>
-        <p class="section-desc">Complete the tasks below. Start from the simple prompt and work your way to the open response.</p>
-        <div id="guided-tasks-container">
-          <!-- filled by JS -->
-        </div>
-        <button class="btn-primary" onclick="showPage('record')" style="margin-top:20px;">Next: Record Your Voice →</button>
-      </section>
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         PAGE: RECORD
-    ══════════════════════════════════════════ -->
-    <div id="page-record" class="page">
-      <div class="page-header">
-        <h1>🎤 Record Your Voice</h1>
-        <p>Record your spoken response, listen back, and improve your pronunciation.</p>
-      </div>
-
-      <div class="record-container">
-        <div class="record-prompt-box">
-          <h3>Speaking Prompt:</h3>
-          <p id="record-prompt">Select a topic first from the Topics page.</p>
-          <button class="btn-play-small" onclick="speakText(document.getElementById('record-prompt').innerText)">🔊 Hear Example</button>
-        </div>
-
-        <!-- Live speech recognition transcript -->
-        <div class="transcript-box">
-          <h3>Your Speech (Live Transcript):</h3>
-          <p id="live-transcript" class="transcript-text">Press "Start Recording" and speak...</p>
-        </div>
-
-        <div class="record-controls">
-          <button class="btn-record" id="btn-record" onclick="toggleRecording()">🎤 Start Recording</button>
-          <button class="btn-play-back" id="btn-playback" onclick="playRecording()" disabled>▶ Play Recording</button>
-          <button class="btn-clear" onclick="clearRecording()">🗑 Clear</button>
-        </div>
-
-        <div class="recordings-list" id="recordings-list">
-          <h3>Your Recordings:</h3>
-          <p id="no-recordings-msg">No recordings yet.</p>
-        </div>
-
-        <button class="btn-primary" onclick="showPage('scenario')" style="margin-top:20px;">Next: Try Scenarios →</button>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         PAGE: SCENARIO
-    ══════════════════════════════════════════ -->
-    <div id="page-scenario" class="page">
-      <div class="page-header">
-        <h1>🎭 Scenario-Based Speaking</h1>
-        <p>Practice speaking in real-life situations. Read the scenario and respond out loud!</p>
-      </div>
-
-      <div class="scenario-container">
-        <div class="scenario-card" id="scenario-card">
-          <div class="scenario-tag" id="scenario-tag">Situation</div>
-          <p class="scenario-text" id="scenario-text">Loading scenario...</p>
-          <div class="scenario-hint" id="scenario-hint"></div>
-        </div>
-
-        <div class="scenario-controls">
-          <button class="btn-play-small" onclick="playScenario()">🔊 Read Aloud</button>
-          <button class="btn-primary" onclick="nextScenario()">Next Scenario →</button>
-        </div>
-
-        <!-- Response area -->
-        <div class="response-area">
-          <h3>Your Response:</h3>
-          <div class="response-transcript-box">
-            <p id="scenario-transcript" class="transcript-text">Press "Record Response" and speak your answer...</p>
+          <div class="hero-stat">
+            <div class="num">3</div>
+            <div class="lbl">Peran</div>
           </div>
-          <div class="scenario-record-controls">
-            <button class="btn-record" id="btn-scenario-record" onclick="toggleScenarioRecording()">🎤 Record Response</button>
-            <button class="btn-play-small" onclick="showSampleAnswer()">💡 Show Sample Answer</button>
-          </div>
-          <div class="sample-answer-box" id="sample-answer-box" style="display:none;">
-            <strong>Sample Answer:</strong>
-            <p id="sample-answer-text"></p>
-            <button class="btn-play-small" onclick="speakText(document.getElementById('sample-answer-text').innerText)">🔊 Hear Sample</button>
+          <div class="hero-stat">
+            <div class="num">∞</div>
+            <div class="lbl">Latihan</div>
           </div>
         </div>
       </div>
     </div>
+  </section>
 
-    <footer class="footer">
-      <p>SpeakOn! — Built for Senior High School English Speaking Practice &nbsp;|&nbsp; Universitas Muhammadiyah Purwokerto 2026</p>
-    </footer>
+  <!-- ── ROLES ── -->
+  <section class="roles-section" id="tentang">
+    <div class="section-label">Siapa yang Menggunakan</div>
+    <h2 class="section-title">Satu Platform, Tiga Peran</h2>
+    <p class="section-sub">SpeakOn! dirancang untuk ekosistem pembelajaran yang lengkap — siswa berlatih, dosen menilai, dan admin mengelola semuanya.</p>
+    <div class="roles-grid">
+      <div class="role-card">
+        <div class="role-icon">👨‍💼</div>
+        <h3>Super Admin</h3>
+        <p>Kelola seluruh pengguna, pantau aktivitas sistem, dan akses laporan audit secara menyeluruh.</p>
+        <span class="role-tag tag-admin">Manajemen Sistem</span>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">👨‍🏫</div>
+        <h3>Dosen</h3>
+        <p>Dengarkan rekaman siswa, berikan feedback tertulis, dan tentukan apakah siswa lulus ke level berikutnya.</p>
+        <span class="role-tag tag-dosen">Penilaian & Feedback</span>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">👨‍🎓</div>
+        <h3>Siswa</h3>
+        <p>Rekam suaramu untuk setiap level, pantau progress belajar, dan terima notifikasi feedback dari dosen.</p>
+        <span class="role-tag tag-siswa">Belajar & Berlatih</span>
+      </div>
+    </div>
+  </section>
 
-    <!-- ── BOTTOM NAV (mobile only) ── -->
-    <nav class="bottom-nav" id="bottom-nav">
-      <button class="bottom-nav-btn active" onclick="showPage('home')">
-        <span class="bnav-icon">🏠</span>
-        <span class="bnav-label">Home</span>
-      </button>
-      <button class="bottom-nav-btn" onclick="showPage('topics')">
-        <span class="bnav-icon">📚</span>
-        <span class="bnav-label">Topics</span>
-      </button>
-      <button class="bottom-nav-btn" onclick="showPage('practice')">
-        <span class="bnav-icon">✍️</span>
-        <span class="bnav-label">Practice</span>
-      </button>
-      <button class="bottom-nav-btn" onclick="showPage('record')">
-        <span class="bnav-icon">🎤</span>
-        <span class="bnav-label">Record</span>
-      </button>
-      <button class="bottom-nav-btn" onclick="showPage('scenario')">
-        <span class="bnav-icon">🎭</span>
-        <span class="bnav-label">Scenario</span>
-      </button>
-    </nav>
+  <!-- ── FEATURES ── -->
+  <section class="features-section" id="fitur">
+    <div class="inner">
+      <div class="header">
+        <div class="section-label">Fitur Unggulan</div>
+        <h2 class="section-title">Semua yang Kamu Butuhkan</h2>
+        <p class="section-sub">Dari rekaman suara hingga sistem penilaian bertingkat — SpeakOn! punya semua fitur untuk mendukung pembelajaran speaking yang efektif.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feat-card">
+          <div class="feat-icon">🎤</div>
+          <h4>Rekam Suara</h4>
+          <p>Rekam langsung dari browser tanpa perlu aplikasi tambahan. Mendukung berbagai format audio.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📊</div>
+          <h4>5 Level Bertingkat</h4>
+          <p>Dari Basic Pronunciation hingga Independent Speaking — setiap level membuka yang berikutnya setelah lulus.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">💬</div>
+          <h4>Feedback Langsung</h4>
+          <p>Dosen memberikan komentar dan penilaian lulus/tidak lulus untuk setiap rekaman yang diupload.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🔔</div>
+          <h4>Notifikasi Real-time</h4>
+          <p>Siswa langsung mendapat notifikasi ketika dosen sudah memberikan feedback pada rekamannya.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🔒</div>
+          <h4>Keamanan Berlapis</h4>
+          <p>JWT authentication, bcrypt password hashing, dan proteksi account lockout setelah 5 percobaan gagal.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📋</div>
+          <h4>Audit Log</h4>
+          <p>Setiap aktivitas tercatat — admin dapat memantau dan mengekspor log audit kapan saja.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🌐</div>
+          <h4>Bilingual (ID / EN)</h4>
+          <p>Antarmuka tersedia dalam Bahasa Indonesia dan Inggris, bisa diganti kapan saja.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📱</div>
+          <h4>Responsif</h4>
+          <p>Tampilan menyesuaikan di semua perangkat — desktop, tablet, maupun smartphone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <script src="script.js"></script>
-  </body>
+  <!-- ── HOW IT WORKS ── -->
+  <section class="how-section" id="cara-kerja">
+    <div class="inner">
+      <div class="section-label">Cara Kerja</div>
+      <h2 class="section-title">Mulai Belajar dalam 4 Langkah</h2>
+      <p class="section-sub">Proses yang sederhana dan terstruktur untuk membantu siswa berkembang secara konsisten.</p>
+      <div class="steps-row">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <h4>Daftar & Login</h4>
+          <p>Admin membuat akun, siswa dan dosen login dengan kredensial yang diberikan.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <h4>Pilih Level</h4>
+          <p>Siswa mulai dari Level 1 dan membuka level berikutnya setelah dinyatakan lulus.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <h4>Rekam Suara</h4>
+          <p>Rekam audio langsung di browser dan upload ke sistem untuk dinilai.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <h4>Terima Feedback</h4>
+          <p>Dosen mendengarkan dan memberikan penilaian. Siswa mendapat notifikasi hasilnya.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <h2>Siap Meningkatkan Kemampuan Speaking?</h2>
+    <p>Masuk sekarang dan mulai perjalanan belajar bahasa Inggrismu bersama SpeakOn!</p>
+    <a href="login.html" class="btn-hero-primary">🚀 Masuk ke SpeakOn!</a>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p><strong>SpeakOn!</strong> — Platform Pembelajaran Bahasa Inggris &nbsp;|&nbsp; Universitas Muhammadiyah Purwokerto 2026</p>
+  </footer>
+
+  <script>
+    // If already logged in, update the login button to go to dashboard instead
+    function checkAuth() {
+      const token = localStorage.getItem('speakon_access_token');
+      const user  = localStorage.getItem('speakon_user');
+      if (token && user) {
+        try {
+          const u = JSON.parse(user);
+          const paths = {
+            superadmin: '/speakon/dashboard-superadmin.html',
+            dosen:      '/speakon/dashboard-dosen.html',
+            siswa:      '/speakon/dashboard-siswa.html',
+          };
+          const dashPath = paths[u.role];
+          if (dashPath) {
+            // Update all login buttons to go to dashboard
+            document.querySelectorAll('a[href="login.html"], a[href="/speakon/login.html"]').forEach(btn => {
+              btn.href = dashPath;
+              btn.textContent = '🏠 Dashboard';
+            });
+          }
+        } catch (_) {}
+      }
+    }
+    checkAuth();
+
+    // Mobile menu toggle
+    function toggleMenu() {
+      document.getElementById('nav-links').classList.toggle('open');
+    }
+
+    // Close menu on link click
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.getElementById('nav-links').classList.remove('open');
+      });
+    });
+  </script>
+</body>
 </html>

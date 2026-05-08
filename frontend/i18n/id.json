@@ -1,0 +1,212 @@
+{
+  "app": {
+    "name": "SpeakOn!",
+    "tagline": "Platform Pembelajaran Bahasa Inggris"
+  },
+  "nav": {
+    "dashboard": "Dasbor",
+    "logout": "Keluar",
+    "profile": "Profil",
+    "notifications": "Notifikasi",
+    "settings": "Pengaturan"
+  },
+  "auth": {
+    "login": "Masuk",
+    "logout": "Keluar",
+    "email": "Email",
+    "password": "Kata Sandi",
+    "emailPlaceholder": "Masukkan email Anda",
+    "passwordPlaceholder": "Masukkan kata sandi Anda",
+    "loginButton": "Masuk",
+    "loggingIn": "Sedang masuk...",
+    "forgotPassword": "Lupa kata sandi?",
+    "loginSuccess": "Login berhasil! Mengalihkan...",
+    "errors": {
+      "invalidCredentials": "Email atau kata sandi tidak valid.",
+      "accountLocked": "Akun dikunci sementara. Coba lagi setelah {minutes} menit.",
+      "accountInactive": "Akun Anda telah dinonaktifkan. Hubungi administrator.",
+      "tokenExpired": "Sesi Anda telah berakhir. Silakan masuk kembali.",
+      "networkError": "Gagal terhubung ke server. Periksa koneksi internet Anda."
+    }
+  },
+  "dashboard": {
+    "superadmin": {
+      "title": "Dasbor Super Admin",
+      "stats": {
+        "totalUsers": "Total Pengguna",
+        "activeSessions": "Sesi Aktif",
+        "pendingTasks": "Tugas Tertunda",
+        "totalDosen": "Total Dosen",
+        "totalSiswa": "Total Siswa"
+      },
+      "sections": {
+        "userManagement": "Manajemen Pengguna",
+        "auditLog": "Log Audit",
+        "activeSessions": "Sesi Aktif",
+        "recentActivity": "Aktivitas Terbaru"
+      }
+    },
+    "dosen": {
+      "title": "Dasbor Dosen",
+      "sections": {
+        "pendingReviews": "Rekaman Menunggu Penilaian",
+        "recentFeedback": "Feedback Terbaru"
+      }
+    },
+    "siswa": {
+      "title": "Dasbor Siswa",
+      "sections": {
+        "progress": "Progress Saya",
+        "notifications": "Notifikasi",
+        "levels": "Level"
+      }
+    }
+  },
+  "users": {
+    "createUser": "Buat Pengguna",
+    "editUser": "Edit Pengguna",
+    "deactivateUser": "Nonaktifkan Pengguna",
+    "fullName": "Nama Lengkap",
+    "email": "Email",
+    "role": "Peran",
+    "status": "Status",
+    "active": "Aktif",
+    "inactive": "Tidak Aktif",
+    "roles": {
+      "superadmin": "Super Admin",
+      "dosen": "Dosen",
+      "siswa": "Siswa"
+    },
+    "tempPassword": "Kata Sandi Sementara",
+    "tempPasswordNote": "Simpan kata sandi ini. Pengguna harus menggantinya saat pertama kali masuk.",
+    "confirmDeactivate": "Apakah Anda yakin ingin menonaktifkan pengguna ini?",
+    "errors": {
+      "emailExists": "Email sudah terdaftar.",
+      "userNotFound": "Pengguna tidak ditemukan."
+    }
+  },
+  "levels": {
+    "level": "Level",
+    "status": {
+      "locked": "Terkunci",
+      "active": "Aktif",
+      "passed": "Lulus"
+    },
+    "progress": "Progress",
+    "progressPercent": "{percent}% Selesai",
+    "unlockMessage": "Selamat! Level {level} telah terbuka.",
+    "lockedMessage": "Selesaikan Level {prev} terlebih dahulu untuk membuka level ini.",
+    "materials": "Materi Level"
+  },
+  "recordings": {
+    "upload": "Upload Rekaman",
+    "uploading": "Mengupload...",
+    "uploadSuccess": "Rekaman berhasil diupload.",
+    "record": "Rekam",
+    "stop": "Berhenti",
+    "play": "Putar",
+    "pause": "Jeda",
+    "duration": "Durasi",
+    "fileSize": "Ukuran File",
+    "uploadedAt": "Diupload pada",
+    "errors": {
+      "fileTooLarge": "Ukuran file melebihi batas 50 MB.",
+      "invalidType": "Format file tidak didukung. Gunakan webm, mp3, ogg, atau wav.",
+      "levelLocked": "Level ini belum terbuka."
+    }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "comment": "Komentar",
+    "commentPlaceholder": "Tulis komentar feedback Anda (minimal 10 karakter)...",
+    "passStatus": "Status Penilaian",
+    "lulus": "Lulus",
+    "tidakLulus": "Tidak Lulus",
+    "submitFeedback": "Kirim Feedback",
+    "updateFeedback": "Perbarui Feedback",
+    "submitting": "Mengirim...",
+    "submitSuccess": "Feedback berhasil dikirim.",
+    "givenBy": "Diberikan oleh",
+    "givenAt": "Diberikan pada",
+    "errors": {
+      "commentTooShort": "Komentar minimal 10 karakter.",
+      "invalidStatus": "Status penilaian tidak valid."
+    }
+  },
+  "notifications": {
+    "title": "Notifikasi",
+    "noNotifications": "Tidak ada notifikasi.",
+    "markAsRead": "Tandai Sudah Dibaca",
+    "markAllRead": "Tandai Semua Sudah Dibaca",
+    "unread": "Belum Dibaca",
+    "read": "Sudah Dibaca",
+    "newFeedback": "Anda mendapat feedback baru dari {dosen} untuk Level {level}.",
+    "levelUnlocked": "Selamat! Level {level} telah terbuka."
+  },
+  "audit": {
+    "title": "Log Audit",
+    "export": "Export CSV",
+    "filters": {
+      "dateFrom": "Dari Tanggal",
+      "dateTo": "Sampai Tanggal",
+      "user": "Pengguna",
+      "action": "Aksi",
+      "search": "Cari"
+    },
+    "columns": {
+      "timestamp": "Waktu",
+      "user": "Pengguna",
+      "role": "Peran",
+      "action": "Aksi",
+      "entity": "Entitas",
+      "ip": "Alamat IP"
+    },
+    "actions": {
+      "login": "Login",
+      "logout": "Logout",
+      "login_failed": "Login Gagal",
+      "account_locked": "Akun Dikunci",
+      "user_created": "Pengguna Dibuat",
+      "user_updated": "Pengguna Diperbarui",
+      "user_deactivated": "Pengguna Dinonaktifkan",
+      "recording_uploaded": "Rekaman Diupload",
+      "feedback_given": "Feedback Diberikan",
+      "feedback_updated": "Feedback Diperbarui",
+      "level_unlocked": "Level Dibuka",
+      "notification_sent": "Notifikasi Dikirim",
+      "notification_read": "Notifikasi Dibaca",
+      "audit_log_exported": "Log Audit Diekspor"
+    }
+  },
+  "common": {
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "view": "Lihat",
+    "search": "Cari",
+    "filter": "Filter",
+    "reset": "Reset",
+    "loading": "Memuat...",
+    "noData": "Tidak ada data.",
+    "error": "Terjadi kesalahan.",
+    "success": "Berhasil.",
+    "confirm": "Konfirmasi",
+    "yes": "Ya",
+    "no": "Tidak",
+    "close": "Tutup",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "previous": "Sebelumnya",
+    "page": "Halaman",
+    "of": "dari",
+    "rows": "baris",
+    "language": "Bahasa"
+  },
+  "errors": {
+    "404": "Halaman tidak ditemukan.",
+    "403": "Anda tidak memiliki izin untuk mengakses halaman ini.",
+    "500": "Terjadi kesalahan pada server.",
+    "networkError": "Gagal terhubung ke server."
+  }
+}

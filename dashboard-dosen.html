@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpeakOn! — Dosen</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#333}
+    nav{background:#1a73e8;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+    nav .brand{font-size:1.3rem;font-weight:700}
+    nav .nav-right{display:flex;align-items:center;gap:.75rem}
+    .btn{padding:.45rem .9rem;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:opacity .2s}
+    .btn:hover{opacity:.85}
+    .btn-white{background:#fff;color:#1a73e8}
+    .btn-primary{background:#1a73e8;color:#fff}
+    .btn-success{background:#43a047;color:#fff}
+    .btn-sm{padding:.3rem .65rem;font-size:.78rem}
+    .lang-btn{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:4px;padding:.2rem .5rem;cursor:pointer;font-size:.78rem}
+    .lang-btn.active{background:#fff;color:#1a73e8}
+    .container{max-width:1100px;margin:0 auto;padding:1.5rem}
+    .section{background:#fff;border-radius:10px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:1.5rem}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+    .section-header h2{font-size:1.05rem;font-weight:700}
+    .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+    .filters input,.filters select{padding:.4rem .7rem;border:1.5px solid #ddd;border-radius:6px;font-size:.83rem}
+    .filters input:focus,.filters select:focus{outline:none;border-color:#1a73e8}
+    /* RECORDING CARDS */
+    .recording-list{display:grid;gap:1rem}
+    .rec-card{border:1.5px solid #e0e0e0;border-radius:10px;padding:1rem;transition:box-shadow .2s}
+    .rec-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+    .rec-card.has-feedback{border-color:#a5d6a7;background:#f9fff9}
+    .rec-meta{display:flex;gap:1rem;flex-wrap:wrap;font-size:.82rem;color:#666;margin-bottom:.75rem}
+    .rec-meta strong{color:#333}
+    .badge{display:inline-block;padding:.2rem .55rem;border-radius:20px;font-size:.75rem;font-weight:600}
+    .badge-lulus{background:#e8f5e9;color:#2e7d32}
+    .badge-tidak{background:#fce4ec;color:#c62828}
+    .badge-pending{background:#fff8e1;color:#f57f17}
+    /* AUDIO PLAYER */
+    .audio-wrap{margin:.5rem 0}
+    audio{width:100%;border-radius:6px}
+    /* FEEDBACK FORM */
+    .feedback-form{margin-top:.75rem;padding-top:.75rem;border-top:1px solid #f0f0f0}
+    .feedback-form textarea{width:100%;padding:.6rem .85rem;border:1.5px solid #ddd;border-radius:7px;font-size:.88rem;resize:vertical;min-height:80px}
+    .feedback-form textarea:focus{outline:none;border-color:#1a73e8}
+    .radio-group{display:flex;gap:1.5rem;margin:.6rem 0}
+    .radio-group label{display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.88rem;font-weight:600}
+    .radio-group input[type=radio]{accent-color:#1a73e8;width:16px;height:16px}
+    .existing-feedback{background:#f5f5f5;border-radius:7px;padding:.75rem;font-size:.85rem;margin-top:.5rem}
+    .existing-feedback .fb-header{font-weight:600;margin-bottom:.35rem;display:flex;justify-content:space-between;align-items:center}
+    .alert{padding:.65rem 1rem;border-radius:7px;font-size:.85rem;margin:.5rem 0;display:none}
+    .alert.error{background:#fdecea;color:#c62828;border:1px solid #ef9a9a}
+    .alert.success{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+    .empty-state{text-align:center;padding:2rem;color:#999}
+    @media(max-width:600px){.rec-meta{flex-direction:column;gap:.25rem}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">SpeakOn! <small style="font-size:.7rem;opacity:.8">Dosen</small></span>
+  <div class="nav-right">
+    <span id="nav-username" style="font-size:.9rem;opacity:.9"></span>
+    <button class="lang-btn active" id="btn-id" onclick="switchLang('id')">ID</button>
+    <button class="lang-btn" id="btn-en" onclick="switchLang('en')">EN</button>
+    <button class="btn btn-white btn-sm" onclick="auth.logout()" data-i18n="nav.logout">Keluar</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- PENDING REVIEWS -->
+  <div class="section">
+    <div class="section-header">
+      <h2 data-i18n="dashboard.dosen.sections.pendingReviews">Rekaman Menunggu Penilaian</h2>
+      <button class="btn btn-sm" style="background:#eee;color:#333" onclick="loadRecordings()">↻ Refresh</button>
+    </div>
+    <div class="filters">
+      <input type="text" id="filter-student" placeholder="Cari nama siswa..." oninput="loadRecordings()" />
+      <select id="filter-level" onchange="loadRecordings()">
+        <option value="">Semua Level</option>
+      </select>
+      <select id="filter-status" onchange="loadRecordings()">
+        <option value="pending">Belum Dinilai</option>
+        <option value="all">Semua</option>
+      </select>
+    </div>
+    <div id="rec-list" class="recording-list">
+      <div class="empty-state">Memuat rekaman...</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="frontend/js/i18n.js"></script>
+<script src="frontend/js/api.js"></script>
+<script src="frontend/js/auth.js"></script>
+<script>
+auth.requireAuth(['dosen']);
+const me = auth.getCurrentUser();
+document.getElementById('nav-username').textContent = me?.fullName || me?.email || '';
+i18n.init(me?.languagePref);
+
+function switchLang(l){
+  i18n.setLanguage(l);
+  document.getElementById('btn-id').classList.toggle('active', l==='id');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+}
+
+// Topik per level untuk konteks dosen
+function fmtDate(d){ return d ? new Date(d).toLocaleString('id-ID') : '—'; }
+function fmtSize(b){ return b ? (b/1024/1024).toFixed(2)+' MB' : '—'; }
+
+const LEVEL_TOPICS = {
+  1: 'Greeting & Self-Introduction',
+  2: 'Asking & Giving Information',
+  3: 'Expressing Opinions & Suggestions',
+  4: 'Narrative & Descriptive Speaking',
+  5: 'Analytical Exposition & Discussion'
+};
+
+// Prompt rekaman per level (agar dosen tahu apa yang diminta dari siswa)
+const LEVEL_PROMPTS = {
+  1: 'Introduce yourself formally. Include your name, age, school, hobbies, and dream.',
+  2: 'Ask about the library location, opening time, and how to borrow a book.',
+  3: 'Give your opinion: "Social media has more negative effects than positive effects on teenagers."',
+  4: 'Tell a story about the most memorable experience in your school life.',
+  5: 'Deliver a short speech: "The importance of learning English in the digital era."'
+};
+
+// ── Load levels for filter ────────────────────────────────────────────────────
+async function loadLevelFilter(){
+  try{
+    const r = await api.get('/levels');
+    const sel = document.getElementById('filter-level');
+    r.data.levels.forEach(l=>{
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.name;
+      sel.appendChild(opt);
+    });
+  }catch(e){}
+}
+
+// ── Load recordings ───────────────────────────────────────────────────────────
+let allRecordings = [];
+let feedbackMap   = {};
+
+async function loadRecordings(){
+  const studentSearch = document.getElementById('filter-student').value.toLowerCase();
+  const levelId       = document.getElementById('filter-level').value;
+  const statusFilter  = document.getElementById('filter-status').value;
+
+  try{
+    const params = { limit: 100, current_only: 1 };
+    if(levelId) params.level_id = levelId;
+
+    const r = await api.get('/recordings', params);
+    allRecordings = r.data.recordings;
+
+    // Load feedback for all recordings
+    const fbResp = await api.get('/feedback', { limit: 200 });
+    feedbackMap  = {};
+    fbResp.data.feedback.forEach(f=>{ feedbackMap[f.recording_id] = f; });
+
+    // Filter
+    let filtered = allRecordings;
+    if(studentSearch) filtered = filtered.filter(r=>r.student_name.toLowerCase().includes(studentSearch));
+    if(statusFilter === 'pending') filtered = filtered.filter(r=>!feedbackMap[r.id]);
+
+    renderRecordings(filtered);
+    // Load audio blobs setelah render (perlu JWT token)
+    filtered.forEach(rec => loadAudioBlob(rec.id));
+  }catch(e){
+    document.getElementById('rec-list').innerHTML = `<div class="empty-state" style="color:#c62828">Gagal memuat: ${e.message||'Error'}</div>`;
+  }
+}
+
+function renderRecordings(recs){
+  const container = document.getElementById('rec-list');
+  if(!recs.length){
+    container.innerHTML = '<div class="empty-state">Tidak ada rekaman yang perlu dinilai.</div>';
+    return;
+  }
+
+  container.innerHTML = recs.map(rec=>{
+    const fb        = feedbackMap[rec.id];
+    const hasFb     = !!fb;
+    const streamUrl = `/speakon/api/recordings/${rec.id}/stream`;
+    const levelNum  = rec.level_order || rec.level_id;
+    const topic     = LEVEL_TOPICS[levelNum] || rec.level_name;
+    const prompt    = LEVEL_PROMPTS[levelNum] || '';
+
+    return `
+    <div class="rec-card ${hasFb?'has-feedback':''}" id="card-${rec.id}">
+      <!-- Header info -->
+      <div class="rec-meta">
+        <span><strong>👤 Siswa:</strong> ${rec.student_name}</span>
+        <span><strong>📚 Level ${levelNum}:</strong> ${topic}</span>
+        <span><strong>📅 Diupload:</strong> ${fmtDate(rec.uploaded_at)}</span>
+        <span><strong>📦 Ukuran:</strong> ${fmtSize(rec.file_size_bytes)}</span>
+        ${hasFb
+          ? `<span class="badge ${fb.pass_status==='lulus'?'badge-lulus':'badge-tidak'}">${fb.pass_status==='lulus'?'✅ Lulus':'❌ Tidak Lulus'}</span>`
+          : '<span class="badge badge-pending">⏳ Belum Dinilai</span>'}
+      </div>
+
+      <!-- Prompt konteks untuk dosen -->
+      ${prompt ? `
+      <div style="background:#f0f7ff;border-left:3px solid #1a73e8;border-radius:6px;padding:.6rem .85rem;margin-bottom:.75rem;font-size:.82rem;color:#1a237e">
+        <strong>📝 Prompt yang diberikan ke siswa:</strong><br/>
+        <em>${prompt}</em>
+      </div>` : ''}
+
+      <!-- Audio player — gunakan blob URL agar token JWT bisa dikirim -->
+      <div class="audio-wrap" id="audio-wrap-${rec.id}">
+        <div style="font-size:.8rem;color:#888;margin-bottom:.3rem">⏳ Memuat audio...</div>
+      </div>
+
+      <!-- Existing feedback -->
+      ${hasFb ? `
+      <div class="existing-feedback">
+        <div class="fb-header">
+          <span>💬 Feedback Anda</span>
+          <button class="btn btn-sm" style="background:#e3f2fd;color:#1565c0" onclick="toggleEditFeedback('${rec.id}')">✏️ Edit</button>
+        </div>
+        <p style="margin:.35rem 0">${fb.comment}</p>
+        <small style="color:#999">Diberikan: ${fmtDate(fb.created_at)}</small>
+      </div>` : ''}
+
+      <!-- Feedback form -->
+      <div class="feedback-form" id="form-${rec.id}" ${hasFb?'style="display:none"':''}>
+        <div id="alert-${rec.id}" class="alert"></div>
+        <label style="font-size:.83rem;font-weight:600;color:#444;display:block;margin-bottom:.35rem">
+          Komentar Feedback <span style="color:#999;font-weight:400">(minimal 10 karakter)</span>
+        </label>
+        <textarea id="comment-${rec.id}"
+          placeholder="Contoh: Pengucapan sudah cukup baik, namun perlu diperbaiki pada intonasi kalimat tanya. Coba latih lagi bagian..."
+          style="width:100%;padding:.6rem .85rem;border:1.5px solid #ddd;border-radius:7px;font-size:.88rem;resize:vertical;min-height:90px"
+        >${hasFb?fb.comment:''}</textarea>
+        <div class="radio-group" style="display:flex;gap:1.5rem;margin:.6rem 0">
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.9rem;font-weight:700;color:#2e7d32">
+            <input type="radio" name="pass-${rec.id}" value="lulus" ${hasFb&&fb.pass_status==='lulus'?'checked':''} style="accent-color:#43a047;width:16px;height:16px" />
+            ✅ Lulus — Level berikutnya akan terbuka
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.9rem;font-weight:700;color:#c62828">
+            <input type="radio" name="pass-${rec.id}" value="tidak_lulus" ${hasFb&&fb.pass_status==='tidak_lulus'?'checked':''} style="accent-color:#e53935;width:16px;height:16px" />
+            ❌ Tidak Lulus — Siswa perlu rekam ulang
+          </label>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="submitFeedback('${rec.id}','${hasFb?fb.id:''}')">
+          ${hasFb ? '💾 Perbarui Feedback' : '📤 Kirim Feedback'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleEditFeedback(recId){
+  const form = document.getElementById(`form-${recId}`);
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── Load audio via fetch (kirim JWT token) ────────────────────────────────────
+async function loadAudioBlob(recId){
+  const wrap = document.getElementById(`audio-wrap-${recId}`);
+  if(!wrap) return;
+  try{
+    const token = api.getAccessToken();
+    const resp  = await fetch(`/speakon/api/recordings/${recId}/stream`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if(!resp.ok){ wrap.innerHTML = '<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio.</div>'; return; }
+    const blob = await resp.blob();
+    const url  = URL.createObjectURL(blob);
+    wrap.innerHTML = `<audio controls style="width:100%;border-radius:6px">
+      <source src="${url}" type="audio/webm" />
+      <source src="${url}" type="audio/ogg" />
+      Browser tidak mendukung audio player.
+    </audio>`;
+  }catch(e){
+    wrap.innerHTML = '<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio: ' + e.message + '</div>';
+  }
+}
+
+async function submitFeedback(recId, existingFbId){
+  const comment    = document.getElementById(`comment-${recId}`).value.trim();
+  const passStatus = document.querySelector(`input[name="pass-${recId}"]:checked`)?.value;
+  const alertEl    = document.getElementById(`alert-${recId}`);
+
+  function showA(msg, type='error'){
+    alertEl.textContent=msg; alertEl.className=`alert ${type}`; alertEl.style.display='block';
+    setTimeout(()=>alertEl.style.display='none', 4000);
+  }
+
+  if(!comment){ showA('Komentar wajib diisi.'); return; }
+  if(comment.length < 10){ showA('Komentar minimal 10 karakter.'); return; }
+  if(!passStatus){ showA('Pilih status penilaian (Lulus / Tidak Lulus).'); return; }
+
+  try{
+    if(existingFbId){
+      await api.put(`/feedback/${existingFbId}`, { comment, pass_status: passStatus });
+      showA('✅ Feedback berhasil diperbarui.', 'success');
+    } else {
+      await api.post('/feedback', { recording_id: recId, comment, pass_status: passStatus });
+      if(passStatus === 'lulus'){
+        showA('✅ Feedback dikirim! Level berikutnya otomatis terbuka untuk siswa.', 'success');
+      } else {
+        showA('📤 Feedback dikirim. Siswa akan mendapat notifikasi untuk rekam ulang.', 'success');
+      }
+    }
+    setTimeout(()=>loadRecordings(), 1500);
+  }catch(e){
+    showA(e.message || 'Gagal menyimpan feedback.');
+  }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async()=>{
+  await loadLevelFilter();
+  await loadRecordings();
+})();
+</script>
+</body>
+</html>

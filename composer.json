@@ -1,0 +1,21 @@
+{
+    "name": "speakon/speakon",
+    "description": "SpeakOn! - Platform Pembelajaran Bahasa Inggris",
+    "type": "project",
+    "require": {
+        "php": ">=8.0",
+        "firebase/php-jwt": "^6.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "SpeakOn\\": "api/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "audit": {
+            "abandoned": "ignore",
+            "block-insecure": false
+        }
+    }
+}

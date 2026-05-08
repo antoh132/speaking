@@ -1,0 +1,31 @@
+# Composer dependencies
+vendor/
+
+# Upload files (rekaman audio siswa — jangan commit)
+uploads/recordings/*.webm
+uploads/recordings/*.mp3
+uploads/recordings/*.ogg
+uploads/recordings/*.wav
+uploads/recordings/*.bin
+
+# Logs
+logs/*.log
+
+# Local config override (berisi credentials)
+api/config/config.local.php
+
+# Environment files
+.env
+.env.local
+
+# IDE / OS
+.vscode/settings.json
+.kiro/
+*.DS_Store
+Thumbs.db
+
+# Test files
+test-write.txt
+
+# Proposal document (opsional — hapus baris ini jika ingin ikut commit)
+UTS_PM_Proposal_-_SpeakOn_.docx.md

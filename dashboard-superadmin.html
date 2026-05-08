@@ -1,0 +1,457 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpeakOn! — Super Admin</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#333}
+    /* NAV */
+    nav{background:#1a73e8;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+    nav .brand{font-size:1.3rem;font-weight:700}
+    nav .nav-right{display:flex;align-items:center;gap:.75rem}
+    nav .nav-right span{font-size:.9rem;opacity:.9}
+    .btn{padding:.45rem .9rem;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:opacity .2s}
+    .btn:hover{opacity:.85}
+    .btn-white{background:#fff;color:#1a73e8}
+    .btn-primary{background:#1a73e8;color:#fff}
+    .btn-danger{background:#e53935;color:#fff}
+    .btn-success{background:#43a047;color:#fff}
+    .btn-sm{padding:.3rem .65rem;font-size:.78rem}
+    .lang-btn{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:4px;padding:.2rem .5rem;cursor:pointer;font-size:.78rem}
+    .lang-btn.active{background:#fff;color:#1a73e8}
+    /* LAYOUT */
+    .container{max-width:1200px;margin:0 auto;padding:1.5rem}
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .stat-card{background:#fff;border-radius:10px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);text-align:center}
+    .stat-card .stat-value{font-size:2rem;font-weight:700;color:#1a73e8}
+    .stat-card .stat-label{font-size:.82rem;color:#666;margin-top:.25rem}
+    /* SECTIONS */
+    .section{background:#fff;border-radius:10px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:1.5rem}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+    .section-header h2{font-size:1.05rem;font-weight:700;color:#333}
+    /* TABLE */
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    th{background:#f5f7fa;padding:.6rem .75rem;text-align:left;font-weight:600;color:#555;border-bottom:2px solid #e0e0e0}
+    td{padding:.6rem .75rem;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+    tr:hover td{background:#fafbff}
+    .badge{display:inline-block;padding:.2rem .55rem;border-radius:20px;font-size:.75rem;font-weight:600}
+    .badge-active{background:#e8f5e9;color:#2e7d32}
+    .badge-inactive{background:#fce4ec;color:#c62828}
+    .badge-superadmin{background:#e3f2fd;color:#1565c0}
+    .badge-dosen{background:#f3e5f5;color:#6a1b9a}
+    .badge-siswa{background:#e8f5e9;color:#2e7d32}
+    /* FILTERS */
+    .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+    .filters input,.filters select{padding:.4rem .7rem;border:1.5px solid #ddd;border-radius:6px;font-size:.83rem}
+    .filters input:focus,.filters select:focus{outline:none;border-color:#1a73e8}
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:#fff;border-radius:12px;padding:1.75rem;width:100%;max-width:460px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+    .modal h3{margin-bottom:1.25rem;font-size:1.1rem}
+    .form-group{margin-bottom:1rem}
+    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;color:#444}
+    .form-group input,.form-group select{width:100%;padding:.6rem .85rem;border:1.5px solid #ddd;border-radius:7px;font-size:.9rem}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:#1a73e8}
+    .modal-actions{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.25rem}
+    .alert{padding:.65rem 1rem;border-radius:7px;font-size:.85rem;margin-bottom:.75rem;display:none}
+    .alert.error{background:#fdecea;color:#c62828;border:1px solid #ef9a9a}
+    .alert.success{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+    .temp-pass-box{background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:.75rem;margin-top:.75rem;font-size:.85rem;display:none}
+    .temp-pass-box strong{display:block;font-size:1.1rem;letter-spacing:.05em;color:#e65100;margin:.25rem 0}
+    /* PAGINATION */
+    .pagination{display:flex;gap:.4rem;justify-content:flex-end;margin-top:.75rem;flex-wrap:wrap}
+    .pagination button{padding:.3rem .65rem;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer;font-size:.8rem}
+    .pagination button.active{background:#1a73e8;color:#fff;border-color:#1a73e8}
+    /* ACTIVITY */
+    .activity-list{list-style:none}
+    .activity-list li{padding:.55rem 0;border-bottom:1px solid #f0f0f0;font-size:.83rem;display:flex;gap:.5rem;align-items:flex-start}
+    .activity-list li:last-child{border-bottom:none}
+    .activity-time{color:#999;white-space:nowrap;font-size:.78rem;min-width:130px}
+    @media(max-width:600px){.stats-grid{grid-template-columns:1fr 1fr}.section-header{flex-direction:column;align-items:flex-start}}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="brand">SpeakOn! <small style="font-size:.7rem;opacity:.8">Super Admin</small></span>
+  <div class="nav-right">
+    <span id="nav-username"></span>
+    <button class="lang-btn active" id="btn-id" onclick="switchLang('id')">ID</button>
+    <button class="lang-btn" id="btn-en" onclick="switchLang('en')">EN</button>
+    <button class="btn btn-white btn-sm" onclick="auth.logout()" data-i18n="nav.logout">Keluar</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- STATS -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-value" id="stat-total-users">—</div><div class="stat-label" data-i18n="dashboard.superadmin.stats.totalUsers">Total Pengguna</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-dosen">—</div><div class="stat-label" data-i18n="dashboard.superadmin.stats.totalDosen">Total Dosen</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-siswa">—</div><div class="stat-label" data-i18n="dashboard.superadmin.stats.totalSiswa">Total Siswa</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-sessions">—</div><div class="stat-label" data-i18n="dashboard.superadmin.stats.activeSessions">Sesi Aktif</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-pending">—</div><div class="stat-label" data-i18n="dashboard.superadmin.stats.pendingTasks">Tugas Tertunda</div></div>
+  </div>
+
+  <!-- USER MANAGEMENT -->
+  <div class="section">
+    <div class="section-header">
+      <h2 data-i18n="dashboard.superadmin.sections.userManagement">Manajemen Pengguna</h2>
+      <button class="btn btn-primary btn-sm" onclick="openCreateModal()" data-i18n="users.createUser">Buat Pengguna</button>
+    </div>
+    <div class="filters">
+      <input type="text" id="user-search" placeholder="Cari nama / email..." oninput="loadUsers()" />
+      <select id="user-role-filter" onchange="loadUsers()">
+        <option value="">Semua Role</option>
+        <option value="dosen">Dosen</option>
+        <option value="siswa">Siswa</option>
+      </select>
+      <select id="user-status-filter" onchange="loadUsers()">
+        <option value="">Semua Status</option>
+        <option value="1">Aktif</option>
+        <option value="0">Tidak Aktif</option>
+      </select>
+    </div>
+    <div id="user-alert" class="alert"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="users.fullName">Nama</th>
+          <th data-i18n="users.email">Email</th>
+          <th data-i18n="users.role">Peran</th>
+          <th data-i18n="users.status">Status</th>
+          <th>Aksi</th>
+        </tr></thead>
+        <tbody id="user-tbody"><tr><td colspan="5" style="text-align:center;color:#999">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="user-pagination"></div>
+  </div>
+
+  <!-- AUDIT LOG -->
+  <div class="section">
+    <div class="section-header">
+      <h2 data-i18n="audit.title">Log Audit</h2>
+      <button class="btn btn-success btn-sm" onclick="exportAudit()" data-i18n="audit.export">Export CSV</button>
+    </div>
+    <div class="filters">
+      <input type="date" id="audit-from" onchange="loadAudit()" />
+      <input type="date" id="audit-to" onchange="loadAudit()" />
+      <select id="audit-action" onchange="loadAudit()">
+        <option value="">Semua Aksi</option>
+        <option value="login">Login</option>
+        <option value="logout">Logout</option>
+        <option value="login_failed">Login Gagal</option>
+        <option value="user_created">User Dibuat</option>
+        <option value="user_updated">User Diperbarui</option>
+        <option value="user_deactivated">User Dinonaktifkan</option>
+        <option value="recording_uploaded">Rekaman Diupload</option>
+        <option value="feedback_given">Feedback Diberikan</option>
+        <option value="level_unlocked">Level Dibuka</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-i18n="audit.columns.timestamp">Waktu</th>
+          <th data-i18n="audit.columns.user">Pengguna</th>
+          <th data-i18n="audit.columns.role">Peran</th>
+          <th data-i18n="audit.columns.action">Aksi</th>
+          <th data-i18n="audit.columns.ip">IP</th>
+        </tr></thead>
+        <tbody id="audit-tbody"><tr><td colspan="5" style="text-align:center;color:#999">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="audit-pagination"></div>
+  </div>
+
+  <!-- ACTIVE SESSIONS -->
+  <div class="section">
+    <div class="section-header">
+      <h2 data-i18n="dashboard.superadmin.sections.activeSessions">Sesi Aktif</h2>
+      <span style="font-size:.78rem;color:#999">Auto-refresh 60 detik</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Nama</th><th>Email</th><th>Peran</th><th>Mulai Sesi</th><th>Berakhir</th>
+        </tr></thead>
+        <tbody id="sessions-tbody"><tr><td colspan="5" style="text-align:center;color:#999">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RECENT ACTIVITY -->
+  <div class="section">
+    <div class="section-header">
+      <h2 data-i18n="dashboard.superadmin.sections.recentActivity">Aktivitas Terbaru</h2>
+    </div>
+    <ul class="activity-list" id="activity-list"><li style="color:#999">Memuat...</li></ul>
+  </div>
+
+</div><!-- /container -->
+
+<!-- CREATE / EDIT USER MODAL -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <h3 id="modal-title">Buat Pengguna</h3>
+    <div id="modal-alert" class="alert"></div>
+    <div class="form-group">
+      <label data-i18n="users.fullName">Nama Lengkap</label>
+      <input type="text" id="m-fullname" placeholder="Nama lengkap" />
+    </div>
+    <div class="form-group">
+      <label data-i18n="users.email">Email</label>
+      <input type="email" id="m-email" placeholder="email@contoh.com" />
+    </div>
+    <div class="form-group" id="m-role-group">
+      <label data-i18n="users.role">Peran</label>
+      <select id="m-role">
+        <option value="dosen">Dosen</option>
+        <option value="siswa">Siswa</option>
+      </select>
+    </div>
+    <div class="temp-pass-box" id="temp-pass-box">
+      <span data-i18n="users.tempPassword">Kata Sandi Sementara:</span>
+      <strong id="temp-pass-value"></strong>
+      <small data-i18n="users.tempPasswordNote">Simpan kata sandi ini.</small>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-sm" style="background:#eee;color:#333" onclick="closeModal()" data-i18n="common.cancel">Batal</button>
+      <button class="btn btn-primary btn-sm" id="modal-submit-btn" onclick="submitUserForm()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="frontend/js/i18n.js"></script>
+<script src="frontend/js/api.js"></script>
+<script src="frontend/js/auth.js"></script>
+<script>
+// ── Guard ────────────────────────────────────────────────────────────────────
+auth.requireAuth(['superadmin']);
+const me = auth.getCurrentUser();
+document.getElementById('nav-username').textContent = me?.fullName || me?.email || '';
+
+// ── i18n ─────────────────────────────────────────────────────────────────────
+i18n.init(me?.languagePref);
+function switchLang(l){
+  i18n.setLanguage(l);
+  document.getElementById('btn-id').classList.toggle('active', l==='id');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function fmtDate(d){ return d ? new Date(d).toLocaleString('id-ID') : '—'; }
+function roleBadge(r){
+  const map={superadmin:'badge-superadmin',dosen:'badge-dosen',siswa:'badge-siswa'};
+  return `<span class="badge ${map[r]||''}">${r}</span>`;
+}
+function showAlert(id, msg, type='error'){
+  const el=document.getElementById(id);
+  el.textContent=msg; el.className=`alert ${type}`; el.style.display='block';
+  setTimeout(()=>{ el.style.display='none'; }, 4000);
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────────
+async function loadStats(){
+  try{
+    const r = await api.get('/admin/stats');
+    const d = r.data;
+    document.getElementById('stat-total-users').textContent = d.users.total;
+    document.getElementById('stat-dosen').textContent       = d.users.dosen;
+    document.getElementById('stat-siswa').textContent       = d.users.siswa;
+    document.getElementById('stat-sessions').textContent    = d.activeSessions;
+    document.getElementById('stat-pending').textContent     = d.pendingTasks;
+  }catch(e){ console.error('Stats error', e); }
+}
+
+// ── Users ────────────────────────────────────────────────────────────────────
+let userOffset=0, userLimit=20;
+async function loadUsers(){
+  userOffset=0;
+  await fetchUsers();
+}
+async function fetchUsers(){
+  const search = document.getElementById('user-search').value;
+  const role   = document.getElementById('user-role-filter').value;
+  const status = document.getElementById('user-status-filter').value;
+  const params = { limit: userLimit, offset: userOffset };
+  if(search) params.search = search;
+  if(role)   params.role   = role;
+  if(status !== '') params.is_active = status;
+  try{
+    const r = await api.get('/users', params);
+    renderUsers(r.data.users);
+  }catch(e){ showAlert('user-alert', e.message||'Gagal memuat pengguna'); }
+}
+function renderUsers(users){
+  const tb = document.getElementById('user-tbody');
+  if(!users.length){ tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#999">Tidak ada data.</td></tr>'; return; }
+  tb.innerHTML = users.map(u=>`
+    <tr>
+      <td>${u.full_name}</td>
+      <td>${u.email}</td>
+      <td>${roleBadge(u.role)}</td>
+      <td><span class="badge ${u.is_active?'badge-active':'badge-inactive'}">${u.is_active?'Aktif':'Tidak Aktif'}</span></td>
+      <td>
+        <button class="btn btn-sm" style="background:#e3f2fd;color:#1565c0" onclick="openEditModal('${u.id}','${u.full_name}','${u.email}','${u.role}')">Edit</button>
+        ${u.is_active && u.id !== me.id ? `<button class="btn btn-danger btn-sm" onclick="deactivateUser('${u.id}','${u.full_name}')">Nonaktifkan</button>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+// ── User Modal ────────────────────────────────────────────────────────────────
+let editUserId = null;
+function openCreateModal(){
+  editUserId=null;
+  document.getElementById('modal-title').textContent='Buat Pengguna';
+  document.getElementById('m-fullname').value='';
+  document.getElementById('m-email').value='';
+  document.getElementById('m-role').value='dosen';
+  document.getElementById('m-role-group').style.display='block';
+  document.getElementById('temp-pass-box').style.display='none';
+  document.getElementById('modal-alert').style.display='none';
+  document.getElementById('modal-submit-btn').textContent='Buat';
+  document.getElementById('user-modal').classList.add('open');
+}
+function openEditModal(id, name, email, role){
+  editUserId=id;
+  document.getElementById('modal-title').textContent='Edit Pengguna';
+  document.getElementById('m-fullname').value=name;
+  document.getElementById('m-email').value=email;
+  document.getElementById('m-role').value=role;
+  document.getElementById('m-role-group').style.display='block';
+  document.getElementById('temp-pass-box').style.display='none';
+  document.getElementById('modal-alert').style.display='none';
+  document.getElementById('modal-submit-btn').textContent='Simpan';
+  document.getElementById('user-modal').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('user-modal').classList.remove('open');
+}
+async function submitUserForm(){
+  const fullName = document.getElementById('m-fullname').value.trim();
+  const email    = document.getElementById('m-email').value.trim();
+  const role     = document.getElementById('m-role').value;
+  if(!fullName||!email){ showAlert('modal-alert','Nama dan email wajib diisi.'); return; }
+  try{
+    if(editUserId){
+      await api.put(`/users/${editUserId}`, { full_name: fullName, email, role });
+      showAlert('user-alert','Pengguna berhasil diperbarui.','success');
+      closeModal();
+    } else {
+      const r = await api.post('/users', { full_name: fullName, email, role });
+      document.getElementById('temp-pass-value').textContent = r.data.tempPassword;
+      document.getElementById('temp-pass-box').style.display='block';
+      document.getElementById('modal-submit-btn').textContent='Tutup';
+      document.getElementById('modal-submit-btn').onclick = ()=>{ closeModal(); fetchUsers(); loadStats(); };
+      return;
+    }
+    fetchUsers(); loadStats();
+  }catch(e){ showAlert('modal-alert', e.message||'Gagal menyimpan pengguna.'); }
+}
+async function deactivateUser(id, name){
+  if(!confirm(`Nonaktifkan pengguna "${name}"?`)) return;
+  try{
+    await api.delete(`/users/${id}`);
+    showAlert('user-alert',`Pengguna "${name}" berhasil dinonaktifkan.`,'success');
+    fetchUsers(); loadStats();
+  }catch(e){ showAlert('user-alert', e.message||'Gagal menonaktifkan pengguna.'); }
+}
+
+// ── Audit Log ────────────────────────────────────────────────────────────────
+let auditOffset=0, auditLimit=30;
+async function loadAudit(){ auditOffset=0; await fetchAudit(); }
+async function fetchAudit(){
+  const from   = document.getElementById('audit-from').value;
+  const to     = document.getElementById('audit-to').value;
+  const action = document.getElementById('audit-action').value;
+  const params = { limit: auditLimit, offset: auditOffset };
+  if(from)   params.date_from   = from;
+  if(to)     params.date_to     = to;
+  if(action) params.action_type = action;
+  try{
+    const r = await api.get('/audit-logs', params);
+    renderAudit(r.data.logs);
+  }catch(e){ console.error('Audit error', e); }
+}
+function renderAudit(logs){
+  const tb = document.getElementById('audit-tbody');
+  if(!logs.length){ tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#999">Tidak ada data.</td></tr>'; return; }
+  tb.innerHTML = logs.map(l=>`
+    <tr>
+      <td>${fmtDate(l.created_at)}</td>
+      <td>${l.user_name||l.user_id||'—'}</td>
+      <td>${l.user_role?roleBadge(l.user_role):'—'}</td>
+      <td>${l.action_type}</td>
+      <td>${l.ip_address||'—'}</td>
+    </tr>`).join('');
+}
+async function exportAudit(){
+  const from   = document.getElementById('audit-from').value;
+  const to     = document.getElementById('audit-to').value;
+  const action = document.getElementById('audit-action').value;
+  let url = '/speakon/api/audit-logs/export?';
+  if(from)   url += `date_from=${from}&`;
+  if(to)     url += `date_to=${to}&`;
+  if(action) url += `action_type=${action}&`;
+  // Trigger download by navigating (token injected via cookie not possible here — use fetch blob)
+  try{
+    const token = api.getAccessToken();
+    const resp  = await fetch(url, { headers:{ Authorization:`Bearer ${token}` } });
+    const blob  = await resp.blob();
+    const a     = document.createElement('a');
+    a.href      = URL.createObjectURL(blob);
+    a.download  = `audit-log-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }catch(e){ alert('Gagal export: '+e.message); }
+}
+
+// ── Active Sessions ───────────────────────────────────────────────────────────
+async function loadSessions(){
+  try{
+    const r = await api.get('/admin/active-sessions', { limit: 50 });
+    const tb = document.getElementById('sessions-tbody');
+    const sessions = r.data.sessions;
+    if(!sessions.length){ tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#999">Tidak ada sesi aktif.</td></tr>'; return; }
+    tb.innerHTML = sessions.map(s=>`
+      <tr>
+        <td>${s.full_name}</td>
+        <td>${s.email}</td>
+        <td>${roleBadge(s.role)}</td>
+        <td>${fmtDate(s.session_started)}</td>
+        <td>${fmtDate(s.expires_at)}</td>
+      </tr>`).join('');
+  }catch(e){ console.error('Sessions error', e); }
+}
+
+// ── Recent Activity ───────────────────────────────────────────────────────────
+async function loadActivity(){
+  try{
+    const r  = await api.get('/admin/recent-activity', { limit: 15 });
+    const ul = document.getElementById('activity-list');
+    const items = r.data.activity;
+    if(!items.length){ ul.innerHTML='<li style="color:#999">Tidak ada aktivitas.</li>'; return; }
+    ul.innerHTML = items.map(a=>`
+      <li>
+        <span class="activity-time">${fmtDate(a.created_at)}</span>
+        <span><strong>${a.user_name||'—'}</strong> ${a.action_type.replace(/_/g,' ')} ${a.entity_type?'('+a.entity_type+')':''}</span>
+      </li>`).join('');
+  }catch(e){ console.error('Activity error', e); }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async()=>{
+  await Promise.all([loadStats(), fetchUsers(), fetchAudit(), loadSessions(), loadActivity()]);
+  // Auto-refresh sessions every 60 seconds
+  setInterval(()=>{ loadSessions(); loadStats(); }, 60000);
+})();
+</script>
+</body>
+</html>
