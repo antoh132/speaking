@@ -20,6 +20,7 @@ api/config/config.local.php
 
 # IDE / OS
 .vscode/settings.json
+.vscode/sftp.json
 .kiro/
 *.DS_Store
 Thumbs.db
