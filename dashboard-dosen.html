@@ -51,8 +51,18 @@
     .alert{padding:.65rem 1rem;border-radius:7px;font-size:.85rem;margin:.5rem 0;display:none}
     .alert.error{background:#fdecea;color:#c62828;border:1px solid #ef9a9a}
     .alert.success{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
-    .empty-state{text-align:center;padding:2rem;color:#999}
-    @media(max-width:600px){.rec-meta{flex-direction:column;gap:.25rem}}
+    /* STEP TABS DOSEN */
+    .step-tabs-dosen{display:flex;border-bottom:2px solid #f0f0f0;background:#fafbff;margin-bottom:1rem}
+    .step-tab-dosen{flex:1;padding:.6rem .4rem;text-align:center;cursor:pointer;font-size:.78rem;font-weight:600;color:#888;border-bottom:3px solid transparent;transition:color .2s,border-color .2s}
+    .step-tab-dosen.active{color:#1a73e8;border-bottom-color:#1a73e8;background:#f0f7ff}
+    .step-panel-dosen{display:none;padding:.75rem 0}
+    .step-panel-dosen.active{display:block}
+    .step-score{display:flex;gap:.75rem;margin:.5rem 0;flex-wrap:wrap}
+    .step-score label{display:flex;align-items:center;gap:.35rem;cursor:pointer;font-size:.85rem;font-weight:600}
+    .step-score input[type=radio]{accent-color:#1a73e8;width:15px;height:15px}
+    .step-comment{width:100%;padding:.5rem .75rem;border:1.5px solid #ddd;border-radius:7px;font-size:.85rem;resize:vertical;min-height:60px;margin-top:.4rem}
+    .step-comment:focus{outline:none;border-color:#1a73e8}
+    .step-content-preview{background:#f0f7ff;border-left:3px solid #1a73e8;border-radius:6px;padding:.6rem .85rem;margin-bottom:.6rem;font-size:.82rem;color:#1a237e}
   </style>
 </head>
 <body>
@@ -82,7 +92,8 @@
       </select>
       <select id="filter-status" onchange="loadRecordings()">
         <option value="pending">Belum Dinilai</option>
-        <option value="all">Semua</option>
+        <option value="current">Rekaman Terbaru</option>
+        <option value="all">Semua Rekaman</option>
       </select>
     </div>
     <div id="rec-list" class="recording-list">
@@ -119,13 +130,53 @@ const LEVEL_TOPICS = {
   5: 'Analytical Exposition & Discussion'
 };
 
-// Prompt rekaman per level (agar dosen tahu apa yang diminta dari siswa)
-const LEVEL_PROMPTS = {
-  1: 'Introduce yourself formally. Include your name, age, school, hobbies, and dream.',
-  2: 'Ask about the library location, opening time, and how to borrow a book.',
-  3: 'Give your opinion: "Social media has more negative effects than positive effects on teenagers."',
-  4: 'Tell a story about the most memorable experience in your school life.',
-  5: 'Deliver a short speech: "The importance of learning English in the digital era."'
+// Konten per level per step untuk konteks dosen
+const LEVEL_STEPS = {
+  1: {
+    topic: 'Greeting & Self-Introduction',
+    steps: [
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "Good morning! My name is Andi Pratama..."', criteria:'Apakah siswa memahami model pengucapan dan intonasi?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: sapa diri, tanya jawab, perkenalan formal', criteria:'Apakah siswa mampu mengucapkan salam dan memperkenalkan diri dengan benar?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Introduce yourself formally (name, age, school, hobbies, dream)', criteria:'Apakah pengucapan, intonasi, dan kelancaran sudah baik?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Siswa baru memperkenalkan diri di kelas / menyambut tamu', criteria:'Apakah siswa mampu berkomunikasi dalam situasi nyata?' }
+    ]
+  },
+  2: {
+    topic: 'Asking & Giving Information',
+    steps: [
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "Excuse me, could you tell me how to get to the library?"', criteria:'Apakah siswa memahami cara meminta dan memberi informasi?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: meminta informasi, petunjuk arah, tanya jawab', criteria:'Apakah siswa mampu menggunakan ekspresi meminta/memberi informasi?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Ask about library location, opening time, and borrowing procedure', criteria:'Apakah pertanyaan disampaikan dengan jelas dan natural?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Membantu tamu / menjelaskan kegiatan ekstrakurikuler', criteria:'Apakah siswa mampu memberi informasi dalam konteks nyata?' }
+    ]
+  },
+  3: {
+    topic: 'Expressing Opinions & Suggestions',
+    steps: [
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "In my opinion, students should limit their screen time..."', criteria:'Apakah siswa memahami cara mengungkapkan pendapat?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: ungkapkan pendapat, berikan saran, setuju/tidak setuju', criteria:'Apakah siswa menggunakan ekspresi pendapat dengan tepat?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Give opinion about social media effects on teenagers', criteria:'Apakah pendapat disampaikan dengan argumen yang jelas?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Diskusi kelas / memberi saran kepada teman', criteria:'Apakah siswa mampu berdiskusi dan memberi saran secara natural?' }
+    ]
+  },
+  4: {
+    topic: 'Narrative & Descriptive Speaking',
+    steps: [
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "Last weekend, I had an unforgettable experience..."', criteria:'Apakah siswa memahami struktur narasi dan deskripsi?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: cerita pengalaman, deskripsi tempat, cerita fiksi', criteria:'Apakah siswa menggunakan past tense dan kata deskriptif dengan benar?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Tell the most memorable experience in school life', criteria:'Apakah cerita disampaikan dengan runtut dan ekspresif?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Mendeskripsikan kota / menceritakan tokoh inspiratif', criteria:'Apakah deskripsi/narasi disampaikan dengan detail dan menarik?' }
+    ]
+  },
+  5: {
+    topic: 'Analytical Exposition & Discussion',
+    steps: [
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "The use of technology in education has both advantages and disadvantages..."', criteria:'Apakah siswa memahami struktur analytical exposition?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: analytical exposition, discussion text, pidato persuasif', criteria:'Apakah siswa mampu menyusun argumen yang logis?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Speech about importance of English in digital era', criteria:'Apakah pidato disampaikan dengan struktur yang jelas dan meyakinkan?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Debat akademik / presentasi hasil penelitian', criteria:'Apakah siswa mampu berargumen dan berpresentasi secara akademik?' }
+    ]
+  }
 };
 
 // ── Load levels for filter ────────────────────────────────────────────────────
@@ -152,13 +203,15 @@ async function loadRecordings(){
   const statusFilter  = document.getElementById('filter-status').value;
 
   try{
-    const params = { limit: 100, current_only: 1 };
+    const params = { limit: 100 };
     if(levelId) params.level_id = levelId;
+    // Untuk "current" dan "pending" hanya tampilkan rekaman terbaru
+    if(statusFilter === 'current' || statusFilter === 'pending') params.current_only = 1;
 
     const r = await api.get('/recordings', params);
     allRecordings = r.data.recordings;
 
-    // Load feedback for all recordings
+    // Load feedback untuk semua rekaman (termasuk yang lama)
     const fbResp = await api.get('/feedback', { limit: 200 });
     feedbackMap  = {};
     fbResp.data.feedback.forEach(f=>{ feedbackMap[f.recording_id] = f; });
@@ -184,16 +237,52 @@ function renderRecordings(recs){
   }
 
   container.innerHTML = recs.map(rec=>{
-    const fb        = feedbackMap[rec.id];
-    const hasFb     = !!fb;
-    const streamUrl = `/speakon/api/recordings/${rec.id}/stream`;
-    const levelNum  = rec.level_order || rec.level_id;
-    const topic     = LEVEL_TOPICS[levelNum] || rec.level_name;
-    const prompt    = LEVEL_PROMPTS[levelNum] || '';
+    const fb       = feedbackMap[rec.id];
+    const hasFb    = !!fb;
+    const levelNum = rec.level_order || rec.level_id;
+    const topic    = LEVEL_TOPICS[levelNum] || rec.level_name;
+    const steps    = LEVEL_STEPS[levelNum]?.steps || [];
+
+    // Parse existing step comments from feedback comment
+    let stepComments = {1:'',2:'',3:'',4:''};
+    let stepScores   = {1:'',2:'',3:'',4:''};
+    if(hasFb && fb.comment){
+      // Format: [S1:score|comment][S2:score|comment]...
+      const matches = fb.comment.matchAll(/\[S(\d):([^|]*)\|([^\]]*)\]/g);
+      for(const m of matches){
+        stepScores[m[1]]   = m[2];
+        stepComments[m[1]] = m[3];
+      }
+      // Fallback: jika format lama (plain text), taruh di step 3
+      if(!fb.comment.includes('[S1:') && !fb.comment.includes('[S3:')){
+        stepComments[3] = fb.comment;
+      }
+    }
+
+    const stepTabs = steps.map(s =>
+      `<div class="step-tab-dosen ${s.num===3?'active':''}" onclick="switchStepTab('${rec.id}',${s.num})" id="stab-${rec.id}-${s.num}">
+        ${s.icon} ${s.label}
+      </div>`
+    ).join('');
+
+    const stepPanels = steps.map(s => {
+      const sc = stepScores[s.num];
+      const cc = stepComments[s.num];
+      return `
+      <div class="step-panel-dosen ${s.num===3?'active':''}" id="spanel-${rec.id}-${s.num}">
+        <div class="step-content-preview">${s.desc}</div>
+        <div style="font-size:.8rem;color:#555;margin-bottom:.4rem;font-weight:600">📋 Kriteria Penilaian: <em style="font-weight:400">${s.criteria}</em></div>
+        <div class="step-score">
+          <label><input type="radio" name="score-${rec.id}-${s.num}" value="baik" ${sc==='baik'?'checked':''}> ✅ Baik</label>
+          <label><input type="radio" name="score-${rec.id}-${s.num}" value="cukup" ${sc==='cukup'?'checked':''}> 🟡 Cukup</label>
+          <label><input type="radio" name="score-${rec.id}-${s.num}" value="perlu_latihan" ${sc==='perlu_latihan'?'checked':''}> 🔴 Perlu Latihan</label>
+        </div>
+        <textarea class="step-comment" id="scomment-${rec.id}-${s.num}" placeholder="Catatan untuk step ini (opsional)...">${cc}</textarea>
+      </div>`;
+    }).join('');
 
     return `
     <div class="rec-card ${hasFb?'has-feedback':''}" id="card-${rec.id}">
-      <!-- Header info -->
       <div class="rec-meta">
         <span><strong>👤 Siswa:</strong> ${rec.student_name}</span>
         <span><strong>📚 Level ${levelNum}:</strong> ${topic}</span>
@@ -204,47 +293,36 @@ function renderRecordings(recs){
           : '<span class="badge badge-pending">⏳ Belum Dinilai</span>'}
       </div>
 
-      <!-- Prompt konteks untuk dosen -->
-      ${prompt ? `
-      <div style="background:#f0f7ff;border-left:3px solid #1a73e8;border-radius:6px;padding:.6rem .85rem;margin-bottom:.75rem;font-size:.82rem;color:#1a237e">
-        <strong>📝 Prompt yang diberikan ke siswa:</strong><br/>
-        <em>${prompt}</em>
-      </div>` : ''}
-
-      <!-- Audio player — gunakan blob URL agar token JWT bisa dikirim -->
+      <!-- Audio player -->
       <div class="audio-wrap" id="audio-wrap-${rec.id}">
-        <div style="font-size:.8rem;color:#888;margin-bottom:.3rem">⏳ Memuat audio...</div>
+        <div style="font-size:.8rem;color:#888;margin-bottom:.3rem">⏳ Memuat audio rekaman Step 3...</div>
       </div>
 
-      <!-- Existing feedback -->
-      ${hasFb ? `
-      <div class="existing-feedback">
-        <div class="fb-header">
-          <span>💬 Feedback Anda</span>
-          <button class="btn btn-sm" style="background:#e3f2fd;color:#1565c0" onclick="toggleEditFeedback('${rec.id}')">✏️ Edit</button>
-        </div>
-        <p style="margin:.35rem 0">${fb.comment}</p>
-        <small style="color:#999">Diberikan: ${fmtDate(fb.created_at)}</small>
-      </div>` : ''}
+      <!-- Penilaian per step -->
+      <div style="margin-top:.75rem">
+        <div style="font-size:.85rem;font-weight:700;color:#333;margin-bottom:.5rem">📊 Penilaian Per Tahap:</div>
+        <div class="step-tabs-dosen">${stepTabs}</div>
+        <div id="stepanels-${rec.id}">${stepPanels}</div>
+      </div>
 
-      <!-- Feedback form -->
-      <div class="feedback-form" id="form-${rec.id}" ${hasFb?'style="display:none"':''}>
+      <!-- Kesimpulan & Submit -->
+      <div class="feedback-form" id="form-${rec.id}" style="margin-top:.75rem;padding-top:.75rem;border-top:2px solid #f0f0f0">
         <div id="alert-${rec.id}" class="alert"></div>
         <label style="font-size:.83rem;font-weight:600;color:#444;display:block;margin-bottom:.35rem">
-          Komentar Feedback <span style="color:#999;font-weight:400">(minimal 10 karakter)</span>
+          💬 Kesimpulan Feedback Keseluruhan <span style="color:#999;font-weight:400">(minimal 10 karakter)</span>
         </label>
         <textarea id="comment-${rec.id}"
-          placeholder="Contoh: Pengucapan sudah cukup baik, namun perlu diperbaiki pada intonasi kalimat tanya. Coba latih lagi bagian..."
-          style="width:100%;padding:.6rem .85rem;border:1.5px solid #ddd;border-radius:7px;font-size:.88rem;resize:vertical;min-height:90px"
-        >${hasFb?fb.comment:''}</textarea>
-        <div class="radio-group" style="display:flex;gap:1.5rem;margin:.6rem 0">
+          placeholder="Tulis kesimpulan penilaian keseluruhan untuk siswa..."
+          style="width:100%;padding:.6rem .85rem;border:1.5px solid #ddd;border-radius:7px;font-size:.88rem;resize:vertical;min-height:70px"
+        >${hasFb ? extractSummary(fb.comment) : ''}</textarea>
+        <div style="display:flex;gap:1.5rem;margin:.6rem 0;flex-wrap:wrap">
           <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.9rem;font-weight:700;color:#2e7d32">
             <input type="radio" name="pass-${rec.id}" value="lulus" ${hasFb&&fb.pass_status==='lulus'?'checked':''} style="accent-color:#43a047;width:16px;height:16px" />
-            ✅ Lulus — Level berikutnya akan terbuka
+            ✅ Lulus — Level berikutnya terbuka
           </label>
           <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.9rem;font-weight:700;color:#c62828">
             <input type="radio" name="pass-${rec.id}" value="tidak_lulus" ${hasFb&&fb.pass_status==='tidak_lulus'?'checked':''} style="accent-color:#e53935;width:16px;height:16px" />
-            ❌ Tidak Lulus — Siswa perlu rekam ulang
+            ❌ Tidak Lulus — Siswa rekam ulang
           </label>
         </div>
         <button class="btn btn-primary btn-sm" onclick="submitFeedback('${rec.id}','${hasFb?fb.id:''}')">
@@ -255,9 +333,22 @@ function renderRecordings(recs){
   }).join('');
 }
 
-function toggleEditFeedback(recId){
-  const form = document.getElementById(`form-${recId}`);
-  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+function switchStepTab(recId, stepNum){
+  for(let i=1;i<=4;i++){
+    const tab   = document.getElementById(`stab-${recId}-${i}`);
+    const panel = document.getElementById(`spanel-${recId}-${i}`);
+    if(tab)   tab.classList.toggle('active', i===stepNum);
+    if(panel) panel.classList.toggle('active', i===stepNum);
+  }
+}
+
+function extractSummary(comment){
+  // Extract summary from structured comment format
+  const match = comment.match(/\[SUMMARY:([^\]]*)\]/);
+  if(match) return match[1];
+  // Fallback: if old format, return as-is
+  if(!comment.includes('[S1:') && !comment.includes('[S3:')) return comment;
+  return '';
 }
 
 // ── Load audio via fetch (kirim JWT token) ────────────────────────────────────
@@ -283,25 +374,36 @@ async function loadAudioBlob(recId){
 }
 
 async function submitFeedback(recId, existingFbId){
-  const comment    = document.getElementById(`comment-${recId}`).value.trim();
+  const summary    = document.getElementById(`comment-${recId}`).value.trim();
   const passStatus = document.querySelector(`input[name="pass-${recId}"]:checked`)?.value;
   const alertEl    = document.getElementById(`alert-${recId}`);
 
   function showA(msg, type='error'){
     alertEl.textContent=msg; alertEl.className=`alert ${type}`; alertEl.style.display='block';
-    setTimeout(()=>alertEl.style.display='none', 4000);
+    setTimeout(()=>alertEl.style.display='none', 5000);
   }
 
-  if(!comment){ showA('Komentar wajib diisi.'); return; }
-  if(comment.length < 10){ showA('Komentar minimal 10 karakter.'); return; }
+  if(!summary){ showA('Kesimpulan feedback wajib diisi.'); return; }
+  if(summary.length < 10){ showA('Kesimpulan minimal 10 karakter.'); return; }
   if(!passStatus){ showA('Pilih status penilaian (Lulus / Tidak Lulus).'); return; }
+
+  // Kumpulkan penilaian per step
+  let stepParts = '';
+  for(let i=1;i<=4;i++){
+    const score   = document.querySelector(`input[name="score-${recId}-${i}"]:checked`)?.value || '';
+    const comment = document.getElementById(`scomment-${recId}-${i}`)?.value.trim() || '';
+    stepParts += `[S${i}:${score}|${comment}]`;
+  }
+
+  // Format comment: step details + summary
+  const fullComment = `${stepParts}[SUMMARY:${summary}]`;
 
   try{
     if(existingFbId){
-      await api.put(`/feedback/${existingFbId}`, { comment, pass_status: passStatus });
+      await api.put(`/feedback/${existingFbId}`, { comment: fullComment, pass_status: passStatus });
       showA('✅ Feedback berhasil diperbarui.', 'success');
     } else {
-      await api.post('/feedback', { recording_id: recId, comment, pass_status: passStatus });
+      await api.post('/feedback', { recording_id: recId, comment: fullComment, pass_status: passStatus });
       if(passStatus === 'lulus'){
         showA('✅ Feedback dikirim! Level berikutnya otomatis terbuka untuk siswa.', 'success');
       } else {

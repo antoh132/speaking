@@ -151,6 +151,17 @@ elseif ($method === 'POST' && ($uri === '' || $uri === '/')) {
     }
 
     try {
+        // Cek jumlah rekaman yang sudah ada untuk level ini (max 5)
+        $pdo = getDB();
+        $countStmt = $pdo->prepare(
+            'SELECT COUNT(*) AS cnt FROM recordings WHERE student_id = :sid AND level_id = :lid'
+        );
+        $countStmt->execute([':sid' => $currentUser->id, ':lid' => $levelId]);
+        $count = (int)$countStmt->fetch()['cnt'];
+        if ($count >= 5) {
+            Response::error(422, 'MAX_ATTEMPTS', 'Kamu sudah mencapai batas maksimal 5 kali rekaman untuk level ini.');
+        }
+
         $recording = RecordingService::uploadRecording($currentUser->id, $levelId, $_FILES['audio']);
 
         AuditService::writeLog(

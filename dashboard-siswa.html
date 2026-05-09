@@ -631,7 +631,14 @@ function toggleNotifPanel(){
   if(notifOpen) loadNotifications();
 }
 async function markRead(id, el){
-  try{ await api.put(`/notifications/${id}/read`); el.classList.remove('unread'); loadNotifCount(); }catch(e){}
+  try{
+    await api.put(`/notifications/${id}/read`);
+    el.classList.remove('unread');
+    loadNotifCount();
+    // Refresh progress — level baru mungkin sudah terbuka
+    await loadProgress();
+    await loadFeedback();
+  }catch(e){}
 }
 async function markAllRead(){
   try{
@@ -710,21 +717,20 @@ function openLevel(levelId, levelNum, levelName, hasUploaded){
   currentLevelId    = levelId;
   currentLevelNum   = levelNum;
   scenarioIndex     = 0;
-  recordingUploaded = (hasUploaded === 'yes'); // sudah pernah upload sebelumnya
+  recordingUploaded = (hasUploaded === 'yes');
   audioBlob         = null;
   audioChunks       = [];
   document.getElementById('learn-panel-title').textContent = `Level ${levelNum} — ${LEVEL_CONTENT[levelNum]?.topic || levelName}`;
 
-  // Tampilkan info jika sudah pernah upload
   const header = document.getElementById('learn-panel-header-info');
-  if(header){
-    header.style.display = hasUploaded === 'yes' ? 'block' : 'none';
-  }
+  if(header) header.style.display = hasUploaded === 'yes' ? 'block' : 'none';
 
   document.getElementById('learn-panel').classList.add('open');
   document.getElementById('learn-panel').scrollIntoView({ behavior:'smooth', block:'start' });
   goStep(1);
   loadLevelContent(levelNum);
+  // Load riwayat rekaman untuk level ini
+  loadRecordingHistory(levelId);
 }
 
 function closeLearnPanel(){
@@ -990,7 +996,7 @@ async function uploadRecording(){
       b.style.background = '#43a047';
       b.textContent = '✅ Selesai & Kirim ke Dosen';
     });
-    setTimeout(()=>{ loadProgress(); loadFeedback(); }, 1500);
+    setTimeout(()=>{ loadProgress(); loadFeedback(); loadRecordingHistory(currentLevelId); }, 1500);
   }catch(e){
     btn.disabled=false; btn.textContent='⬆ Upload Rekaman';
     showRecAlert(e.message||'Gagal mengupload rekaman.');
@@ -1095,26 +1101,115 @@ function finishLevel(){
 }
 
 // ── Feedback ──────────────────────────────────────────────────────────────────
+function parseFeedbackComment(comment){
+  if(!comment) return { steps:{}, summary: comment };
+  const steps = {};
+  const stepLabels = {1:'Dengarkan',2:'Latihan',3:'Rekam',4:'Skenario'};
+  const scoreLabels = {baik:'✅ Baik', cukup:'🟡 Cukup', perlu_latihan:'🔴 Perlu Latihan'};
+  const matches = comment.matchAll(/\[S(\d):([^|]*)\|([^\]]*)\]/g);
+  for(const m of matches){
+    const num = parseInt(m[1]);
+    steps[num] = {
+      label: stepLabels[num] || `Step ${num}`,
+      score: scoreLabels[m[2]] || m[2],
+      comment: m[3]
+    };
+  }
+  const summaryMatch = comment.match(/\[SUMMARY:([^\]]*)\]/);
+  const summary = summaryMatch ? summaryMatch[1] : (Object.keys(steps).length === 0 ? comment : '');
+  return { steps, summary };
+}
+
 async function loadFeedback(){
   try{
     const r = await api.get('/feedback', { limit: 10 });
     const items = r.data.feedback;
     if(!items.length){ document.getElementById('feedback-section').style.display='none'; return; }
     document.getElementById('feedback-section').style.display='block';
-    document.getElementById('feedback-list').innerHTML = items.map(f=>`
+    document.getElementById('feedback-list').innerHTML = items.map(f=>{
+      const parsed = parseFeedbackComment(f.comment);
+      const stepHtml = Object.values(parsed.steps).map(s=>`
+        <div style="display:flex;gap:.5rem;align-items:flex-start;margin-bottom:.3rem;font-size:.83rem">
+          <span style="min-width:80px;font-weight:600;color:#555">${s.label}:</span>
+          <span>${s.score}${s.comment ? ` — <em style="color:#666">${s.comment}</em>` : ''}</span>
+        </div>`).join('');
+      return `
       <div class="feedback-card ${f.pass_status}">
         <div class="fb-status ${f.pass_status==='lulus'?'lulus':'tidak'}">
           ${f.pass_status==='lulus'?'✅ Lulus':'❌ Tidak Lulus'} — ${f.level_name||''}
         </div>
-        <p style="margin:.35rem 0;font-size:.88rem">${f.comment}</p>
+        ${stepHtml ? `<div style="margin:.5rem 0;padding:.5rem;background:#f9f9f9;border-radius:6px">${stepHtml}</div>` : ''}
+        ${parsed.summary ? `<p style="margin:.35rem 0;font-size:.88rem"><strong>Kesimpulan:</strong> ${parsed.summary}</p>` : ''}
         <small style="color:#999">Dari: ${f.dosen_name||'Dosen'} · ${fmtDate(f.created_at)}</small>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }catch(e){}
+}
+
+// ── Recording History ─────────────────────────────────────────────────────────
+async function loadRecordingHistory(levelId){
+  if(!levelId) return;
+  try{
+    const r = await api.get('/recordings', { level_id: levelId, limit: 10 });
+    const recs = r.data.recordings;
+    const histDiv  = document.getElementById('recording-history');
+    const histList = document.getElementById('recording-history-list');
+    if(!histDiv || !histList) return;
+
+    if(!recs.length){ histDiv.style.display='none'; return; }
+
+    histDiv.style.display = 'block';
+    const attemptCount = recs.length;
+    const remaining    = 5 - attemptCount;
+
+    histList.innerHTML = `
+      <div style="font-size:.8rem;color:#666;margin-bottom:.5rem">
+        Percobaan: <strong>${attemptCount}/5</strong>
+        ${remaining > 0 ? `— Sisa <strong>${remaining}</strong> kali` : ' — <span style="color:#e53935">Batas maksimal tercapai</span>'}
+      </div>
+      ${recs.map((rec, i) => `
+        <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:.65rem;margin-bottom:.5rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem">
+            <span style="font-size:.8rem;font-weight:700;color:#1a73e8">Percobaan ${attemptCount - i}</span>
+            <span style="font-size:.75rem;color:#999">${fmtDate(rec.uploaded_at)}</span>
+          </div>
+          <div id="hist-audio-${rec.id}" style="font-size:.78rem;color:#888">⏳ Memuat...</div>
+        </div>`).join('')}`;
+
+    // Load audio untuk setiap rekaman
+    recs.forEach(rec => loadHistoryAudio(rec.id));
+
+    // Disable upload jika sudah 5 kali
+    if(remaining <= 0){
+      const uploadBtn = document.getElementById('btn-upload');
+      if(uploadBtn){ uploadBtn.disabled=true; uploadBtn.textContent='Batas 5x tercapai'; uploadBtn.style.background='#999'; }
+      const startBtn = document.getElementById('btn-rec-start');
+      if(startBtn){ startBtn.disabled=true; startBtn.style.opacity='.5'; }
+    }
+  }catch(e){ console.error('History error', e); }
+}
+
+async function loadHistoryAudio(recId){
+  const wrap = document.getElementById(`hist-audio-${recId}`);
+  if(!wrap) return;
+  try{
+    const token = api.getAccessToken();
+    const base  = window.location.pathname.startsWith('/speakon/') ? '/speakon' : '';
+    const resp  = await fetch(`${base}/api/recordings/${recId}/stream`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if(!resp.ok){ wrap.innerHTML = '⚠️ Gagal memuat'; return; }
+    const blob = await resp.blob();
+    const url  = URL.createObjectURL(blob);
+    wrap.innerHTML = `<audio controls style="width:100%;height:30px;border-radius:5px"><source src="${url}" type="audio/webm"/></audio>`;
+  }catch(e){ wrap.innerHTML = '⚠️ Error'; }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 (async()=>{
   await Promise.all([loadProgress(), loadFeedback(), loadNotifCount()]);
+  // Auto-refresh setiap 30 detik untuk cek level baru yang terbuka
+  setInterval(()=>{ loadProgress(); loadFeedback(); loadNotifCount(); }, 30000);
 })();
 </script></body>
 </html>
