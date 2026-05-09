@@ -12,7 +12,7 @@ uploads/recordings/*.bin
 logs/*.log
 
 # Local config override (berisi credentials)
-api/config/config.local.php
+# api/config/config.local.php
 
 # Environment files
 .env
