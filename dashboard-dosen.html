@@ -279,8 +279,11 @@ async function loadRecordings(){
   try{
     const params = { limit: 200 };
     if(levelId) params.level_id = levelId;
-    // Hanya filter current_only jika pilih "current"
-    if(statusFilter === 'current') params.current_only = 1;
+
+    // "pending" dan "current" hanya ambil rekaman terbaru per siswa per level
+    if(statusFilter === 'pending' || statusFilter === 'current') {
+      params.current_only = 1;
+    }
 
     const r = await api.get('/recordings', params);
     allRecordings = r.data.recordings;
@@ -290,10 +293,18 @@ async function loadRecordings(){
     feedbackMap  = {};
     fbResp.data.feedback.forEach(f=>{ feedbackMap[f.recording_id] = f; });
 
-    // Filter
+    // Filter berdasarkan status
     let filtered = allRecordings;
     if(studentSearch) filtered = filtered.filter(r=>r.student_name.toLowerCase().includes(studentSearch));
     if(statusFilter === 'pending') filtered = filtered.filter(r=>!feedbackMap[r.id]);
+
+    // Urutkan: belum dinilai dulu, lalu terbaru
+    filtered.sort((a, b) => {
+      const aHasFb = !!feedbackMap[a.id];
+      const bHasFb = !!feedbackMap[b.id];
+      if(aHasFb !== bHasFb) return aHasFb ? 1 : -1; // belum dinilai di atas
+      return new Date(b.uploaded_at) - new Date(a.uploaded_at); // terbaru di atas
+    });
 
     renderRecordings(filtered);
     filtered.forEach(rec => loadAudioBlob(rec.id));
@@ -402,6 +413,7 @@ function renderRecordings(recs){
         <span><strong>📚 Level ${levelNum}:</strong> ${topic}</span>
         <span><strong>📅 Diupload:</strong> ${fmtDate(rec.uploaded_at)}</span>
         <span><strong>📦 Ukuran:</strong> ${fmtSize(rec.file_size_bytes)}</span>
+        ${rec.is_current ? '<span style="background:#e3f2fd;color:#1565c0;padding:.2rem .55rem;border-radius:20px;font-size:.75rem;font-weight:600">🔄 Rekaman Terbaru</span>' : '<span style="background:#f5f5f5;color:#999;padding:.2rem .55rem;border-radius:20px;font-size:.75rem">📁 Rekaman Lama</span>'}
         ${hasFb
           ? `<span class="badge ${fb.pass_status==='lulus'?'badge-lulus':'badge-tidak'}">${fb.pass_status==='lulus'?'✅ Lulus':'❌ Tidak Lulus'}</span>`
           : '<span class="badge badge-pending">⏳ Belum Dinilai</span>'}
