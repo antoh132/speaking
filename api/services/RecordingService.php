@@ -32,7 +32,7 @@ class RecordingService
      * @return array              The newly created recording record.
      * @throws RuntimeException   On validation failure or storage error.
      */
-    public static function uploadRecording(string $studentId, string $levelId, array $file): array
+    public static function uploadRecording(string $studentId, string $levelId, array $file, ?int $taskIndex = null): array
     {
         // Validate file was uploaded without errors
         if ($file['error'] !== UPLOAD_ERR_OK) {
@@ -109,17 +109,29 @@ class RecordingService
 
         $pdo = getDB();
 
-        // Mark previous recordings for this (student, level) as not current
-        $markOldStmt = $pdo->prepare(
-            'UPDATE recordings SET is_current = 0
-              WHERE student_id = :student_id
-                AND level_id   = :level_id
-                AND is_current = 1'
-        );
-        $markOldStmt->execute([
-            ':student_id' => $studentId,
-            ':level_id'   => $levelId,
-        ]);
+        // Mark previous recordings for this (student, level, task_index) as not current
+        if ($taskIndex === null) {
+            // Step 3 main recording — mark old main recordings as not current
+            $markOldStmt = $pdo->prepare(
+                'UPDATE recordings SET is_current = 0
+                  WHERE student_id = :student_id
+                    AND level_id   = :level_id
+                    AND task_index IS NULL
+                    AND is_current = 1'
+            );
+        } else {
+            // Task recording — mark old task recordings for same task as not current
+            $markOldStmt = $pdo->prepare(
+                'UPDATE recordings SET is_current = 0
+                  WHERE student_id = :student_id
+                    AND level_id   = :level_id
+                    AND task_index = :task_index
+                    AND is_current = 1'
+            );
+        }
+        $params = [':student_id' => $studentId, ':level_id' => $levelId];
+        if ($taskIndex !== null) $params[':task_index'] = $taskIndex;
+        $markOldStmt->execute($params);
 
         // Insert new recording record
         $recordingId = generateUUID();
@@ -127,9 +139,9 @@ class RecordingService
 
         $insertStmt = $pdo->prepare(
             'INSERT INTO recordings
-                (id, student_id, level_id, file_path, file_size_bytes, duration_seconds, uploaded_at, is_current)
+                (id, student_id, level_id, file_path, file_size_bytes, duration_seconds, uploaded_at, is_current, task_index)
              VALUES
-                (:id, :student_id, :level_id, :file_path, :file_size, NULL, NOW(), 1)'
+                (:id, :student_id, :level_id, :file_path, :file_size, NULL, NOW(), 1, :task_index)'
         );
         $insertStmt->execute([
             ':id'         => $recordingId,
@@ -137,6 +149,7 @@ class RecordingService
             ':level_id'   => $levelId,
             ':file_path'  => $relPath,
             ':file_size'  => $file['size'],
+            ':task_index' => $taskIndex,
         ]);
 
         return self::getRecordingById($recordingId);
@@ -151,16 +164,30 @@ class RecordingService
     public static function getRecordingById(string $recordingId): ?array
     {
         $pdo  = getDB();
+    public static function getRecordingById(string $recordingId): ?array
+    {
+        $pdo  = getDB();
+
+        // Check if task_index column exists
+        $hasTaskIndex = false;
+        try {
+            $check = $pdo->query("SHOW COLUMNS FROM recordings LIKE 'task_index'");
+            $hasTaskIndex = $check->rowCount() > 0;
+        } catch (\Exception $e) {}
+
+        $taskIndexSelect = $hasTaskIndex ? 'r.task_index' : 'NULL AS task_index';
+
         $stmt = $pdo->prepare(
-            'SELECT r.id, r.student_id, r.level_id, r.file_path, r.file_size_bytes,
+            "SELECT r.id, r.student_id, r.level_id, r.file_path, r.file_size_bytes,
                     r.duration_seconds, r.uploaded_at, r.is_current,
+                    {$taskIndexSelect},
                     u.full_name AS student_name,
                     l.name AS level_name, l.order_index AS level_order
                FROM recordings r
                JOIN users u ON u.id = r.student_id
                JOIN levels l ON l.id = r.level_id
               WHERE r.id = :id
-              LIMIT 1'
+              LIMIT 1"
         );
         $stmt->execute([':id' => $recordingId]);
         $row = $stmt->fetch();
@@ -205,16 +232,26 @@ class RecordingService
             $where[] = 'r.is_current = 1';
         }
 
-        $sql = 'SELECT r.id, r.student_id, r.level_id, r.file_path, r.file_size_bytes,
+        // Check if task_index column exists (migration may not have run yet)
+        $hasTaskIndex = false;
+        try {
+            $check = $pdo->query("SHOW COLUMNS FROM recordings LIKE 'task_index'");
+            $hasTaskIndex = $check->rowCount() > 0;
+        } catch (\Exception $e) {}
+
+        $taskIndexSelect = $hasTaskIndex ? 'r.task_index' : 'NULL AS task_index';
+
+        $sql = "SELECT r.id, r.student_id, r.level_id, r.file_path, r.file_size_bytes,
                        r.duration_seconds, r.uploaded_at, r.is_current,
+                       {$taskIndexSelect},
                        u.full_name AS student_name,
                        l.name AS level_name, l.order_index AS level_order
                   FROM recordings r
                   JOIN users u ON u.id = r.student_id
                   JOIN levels l ON l.id = r.level_id
-                 WHERE ' . implode(' AND ', $where) . '
+                 WHERE " . implode(' AND ', $where) . "
                  ORDER BY r.uploaded_at DESC
-                 LIMIT :limit OFFSET :offset';
+                 LIMIT :limit OFFSET :offset";
 
         $stmt = $pdo->prepare($sql);
         foreach ($params as $key => $value) {

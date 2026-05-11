@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS recordings (
     duration_seconds DECIMAL(6,2)   NULL,
     uploaded_at      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_current       TINYINT(1)     NOT NULL DEFAULT 1,
+    task_index       TINYINT        NULL,         -- NULL = Step 3 main recording, 0/1/2 = Step 2 task recordings
     PRIMARY KEY (id),
     CONSTRAINT fk_recordings_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_recordings_level   FOREIGN KEY (level_id)   REFERENCES levels(id)

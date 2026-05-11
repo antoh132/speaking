@@ -1,103 +1,41 @@
-#!/usr/bin/env php
 <?php
 /**
- * SpeakOn! — Database Migration Runner
+ * SpeakOn! — Database Migration Script
  *
- * Runs schema.sql against the configured MySQL database.
- * Execute from the project root:
- *
- *   php database/migrate.php
- *   php database/migrate.php --seed      # also run seed.sql
- *   php database/migrate.php --fresh     # DROP and recreate database first
- *
- * Requirements: PHP 8.x CLI with PDO + pdo_mysql extension enabled.
+ * Jalankan file ini sekali untuk menambah kolom baru ke database yang sudah ada.
+ * Usage: php database/migrate.php
+ * Atau akses via browser: http://localhost/speakon/database/migrate.php
  */
 
 require_once __DIR__ . '/../api/config/config.php';
+require_once __DIR__ . '/../api/config/db.php';
 
-// ── Parse CLI arguments ───────────────────────────────────────────────────────
-$args  = array_slice($argv, 1);
-$seed  = in_array('--seed',  $args, true);
-$fresh = in_array('--fresh', $args, true);
+$pdo = getDB();
+$results = [];
 
-// ── Connect without selecting a database first ────────────────────────────────
-$dsn = sprintf('mysql:host=%s;port=%s;charset=utf8mb4', DB_HOST, DB_PORT);
-
+// ── Migration 1: Tambah kolom task_index ke tabel recordings ─────────────────
 try {
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ]);
-} catch (PDOException $e) {
-    fwrite(STDERR, "ERROR: Cannot connect to MySQL: " . $e->getMessage() . "\n");
-    exit(1);
-}
-
-// ── Optional: drop and recreate database ─────────────────────────────────────
-if ($fresh) {
-    echo "⚠  --fresh flag detected. Dropping database '" . DB_NAME . "'...\n";
-    $pdo->exec("DROP DATABASE IF EXISTS `" . DB_NAME . "`");
-    echo "   Database dropped.\n";
-}
-
-// ── Run schema.sql ────────────────────────────────────────────────────────────
-$schemaFile = __DIR__ . '/schema.sql';
-if (!file_exists($schemaFile)) {
-    fwrite(STDERR, "ERROR: schema.sql not found at {$schemaFile}\n");
-    exit(1);
-}
-
-echo "Running schema.sql...\n";
-runSqlFile($pdo, $schemaFile);
-echo "✓  Schema applied successfully.\n";
-
-// ── Optional: run seed.sql ────────────────────────────────────────────────────
-if ($seed) {
-    $seedFile = __DIR__ . '/seed.sql';
-    if (!file_exists($seedFile)) {
-        fwrite(STDERR, "WARNING: seed.sql not found at {$seedFile}\n");
+    // Cek apakah kolom sudah ada
+    $check = $pdo->query("SHOW COLUMNS FROM recordings LIKE 'task_index'");
+    if ($check->rowCount() === 0) {
+        $pdo->exec("ALTER TABLE recordings ADD COLUMN task_index TINYINT NULL DEFAULT NULL COMMENT 'NULL=Step3 main, 0/1/2=Step2 task recordings'");
+        $results[] = '✅ Kolom task_index berhasil ditambahkan ke tabel recordings.';
     } else {
-        echo "Running seed.sql...\n";
-        runSqlFile($pdo, $seedFile);
-        echo "✓  Seed data inserted.\n";
+        $results[] = 'ℹ️ Kolom task_index sudah ada di tabel recordings.';
     }
+} catch (Exception $e) {
+    $results[] = '❌ Gagal menambah kolom task_index: ' . $e->getMessage();
 }
 
-echo "\nMigration complete.\n";
-exit(0);
-
-// ── Helper: execute a .sql file statement by statement ────────────────────────
-function runSqlFile(PDO $pdo, string $filePath): void
-{
-    $sql = file_get_contents($filePath);
-    if ($sql === false) {
-        fwrite(STDERR, "ERROR: Cannot read file: {$filePath}\n");
-        exit(1);
-    }
-
-    // Split on semicolons, skip empty statements and pure comments
-    $statements = array_filter(
-        array_map('trim', explode(';', $sql)),
-        fn(string $s): bool => $s !== '' && !preg_match('/^--/', $s)
-    );
-
-    foreach ($statements as $statement) {
-        try {
-            $pdo->exec($statement);
-        } catch (PDOException $e) {
-            // Ignore "table already exists" and "duplicate entry" errors
-            // so the migration is idempotent
-            $code = (int) $e->getCode();
-            if (in_array($code, [1050, 1061, 1062], true)) {
-                // 1050 = Table already exists
-                // 1061 = Duplicate key name
-                // 1062 = Duplicate entry
-                continue;
-            }
-            fwrite(STDERR, "SQL ERROR [{$code}]: " . $e->getMessage() . "\n");
-            fwrite(STDERR, "Statement: " . substr($statement, 0, 200) . "\n");
-            exit(1);
-        }
-    }
+// Output hasil
+header('Content-Type: text/html; charset=utf-8');
+echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SpeakOn! Migration</title>';
+echo '<style>body{font-family:sans-serif;max-width:600px;margin:2rem auto;padding:1rem}';
+echo '.ok{color:#2e7d32}.info{color:#1565c0}.err{color:#c62828}</style></head><body>';
+echo '<h2>SpeakOn! — Database Migration</h2>';
+foreach ($results as $r) {
+    $cls = str_starts_with($r, '✅') ? 'ok' : (str_starts_with($r, 'ℹ️') ? 'info' : 'err');
+    echo "<p class=\"$cls\">$r</p>";
 }
+echo '<p><a href="/speakon/dashboard-dosen.html">Kembali ke Dashboard Dosen</a></p>';
+echo '</body></html>';
