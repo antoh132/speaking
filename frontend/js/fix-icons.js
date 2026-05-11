@@ -1,121 +1,106 @@
 /**
  * Fix broken emoji icons caused by UTF-8 encoding issue in dashboard-siswa.html
- * This script replaces broken mojibake text with correct emoji using innerHTML replacement
- * on specific known elements.
  */
 document.addEventListener('DOMContentLoaded', function () {
 
-  // Elements with known broken text — replace innerHTML directly
-  var elementFixes = [
-    // Step headings
-    { sel: '#step-1 h4',        html: '&#128266; Step 1 &ndash; Dengarkan Audio Model' },
-    { sel: '#step-2 h4',        html: '&#9999;&#65039; Step 2 &ndash; Latihan Berbicara Terbimbing' },
-    { sel: '#step-3 h4',        html: '&#127908; Step 3 &ndash; Rekam Suaramu' },
-    { sel: '#step-3 .rec-prompt-box h4', html: '&#128221; Prompt Berbicara:' },
-    { sel: '#step-4 h4',        html: '&#127917; Step 4 &ndash; Latihan Berbasis Skenario' },
-    // Feedback section heading
-    { sel: '#feedback-section h2', html: '&#128172; Feedback dari Dosen' },
-    // Dialogue box heading
-    { sel: '.dialogue-box h4',  html: '&#128172; Contoh Dialog' },
-  ];
+  // Fix step headings
+  var step1h4 = document.querySelector('#step-1 h4');
+  if (step1h4) step1h4.textContent = '🔊 Step 1 – Dengarkan Audio Model';
 
-  elementFixes.forEach(function (fix) {
-    var el = document.querySelector(fix.sel);
-    if (el) el.innerHTML = fix.html;
-  });
+  var step2h4 = document.querySelector('#step-2 h4');
+  if (step2h4) step2h4.textContent = '✏️ Step 2 – Latihan Berbicara Terbimbing';
 
-  // Fix button text nodes — use textContent for buttons
-  var buttonFixes = [
-    // Nav notification button (keep badge inside)
-    { sel: '#notif-btn',         prefix: '&#128276; ' },
-    // Play buttons
-    { sel: '.btn-play',          text: '&#9654; Putar Audio' },
-    // Close panel button
-    { sel: '.learn-panel-close', text: '&#10005; Tutup' },
-    // Upload button
-    { sel: '#btn-upload',        text: '&#11014; Upload Rekaman' },
-    // Finish level button
-    { sel: 'button[onclick="finishLevel()"]', text: '&#10003; Selesai Level Ini' },
-    // Refresh feedback button
-    { sel: 'button[onclick="loadFeedback()"]', text: '&#8635; Refresh' },
-  ];
+  var step3h4 = document.querySelector('#step-3 h4');
+  if (step3h4) step3h4.textContent = '🎤 Step 3 – Rekam Suaramu';
 
-  buttonFixes.forEach(function (fix) {
-    var el = document.querySelector(fix.sel);
-    if (!el) return;
-    if (fix.text) {
-      el.textContent = fix.text;
-    }
-  });
+  var step3prompth4 = document.querySelector('#step-3 .rec-prompt-box h4');
+  if (step3prompth4) step3prompth4.textContent = '📝 Prompt Berbicara:';
 
-  // Fix buttons with dynamic text using querySelectorAll
-  // "Putar Dialog" button
+  var step4h4 = document.querySelector('#step-4 h4');
+  if (step4h4) step4h4.textContent = '🎭 Step 4 – Latihan Berbasis Skenario';
+
+  // Fix dialogue box heading
+  var dialogueH4 = document.querySelector('.dialogue-box h4');
+  if (dialogueH4) dialogueH4.textContent = '💬 Contoh Dialog';
+
+  // Fix feedback section heading
+  var feedbackH2 = document.querySelector('#feedback-section h2');
+  if (feedbackH2) feedbackH2.textContent = '💬 Feedback dari Dosen';
+
+  // Fix close button
+  var closeBtn = document.querySelector('.learn-panel-close');
+  if (closeBtn) closeBtn.textContent = '✕ Tutup';
+
+  // Fix play buttons
+  var playBtn = document.querySelector('.btn-play');
+  if (playBtn) playBtn.textContent = '▶ Putar Audio';
+
   var playDialogueBtn = document.querySelector('button[onclick="playDialogue()"]');
-  if (playDialogueBtn) playDialogueBtn.innerHTML = '&#9654; Putar Dialog';
+  if (playDialogueBtn) playDialogueBtn.textContent = '▶ Putar Dialog';
 
-  // "Dengar Contoh" buttons in step 3
+  // Fix step 3 buttons
   var speakPromptBtn = document.querySelector('button[onclick="speakPrompt()"]');
-  if (speakPromptBtn) speakPromptBtn.innerHTML = '&#128266; Dengar Contoh';
+  if (speakPromptBtn) speakPromptBtn.textContent = '🔊 Dengar Contoh';
 
-  // Record start/stop buttons
   var recStart = document.getElementById('btn-rec-start');
-  if (recStart) recStart.innerHTML = '&#9210; Mulai Rekam';
+  if (recStart) recStart.textContent = '⏺ Mulai Rekam';
 
   var recStop = document.getElementById('btn-rec-stop');
-  if (recStop) recStop.innerHTML = '&#9209; Berhenti';
+  if (recStop) recStop.textContent = '⏹ Berhenti';
 
-  var scStart = document.getElementById('btn-sc-start');
-  if (scStart) scStart.innerHTML = '&#9210; Rekam Respons';
+  var uploadBtn = document.getElementById('btn-upload');
+  if (uploadBtn) uploadBtn.textContent = '⬆ Upload Rekaman';
 
-  var scStop = document.getElementById('btn-sc-stop');
-  if (scStop) scStop.innerHTML = '&#9209; Berhenti';
-
-  // Scenario buttons
+  // Fix step 4 buttons
   var playScenarioBtn = document.querySelector('button[onclick="playScenario()"]');
-  if (playScenarioBtn) playScenarioBtn.innerHTML = '&#128266; Baca Skenario';
+  if (playScenarioBtn) playScenarioBtn.textContent = '🔊 Baca Skenario';
 
   var nextScenarioBtn = document.querySelector('button[onclick="nextScenario()"]');
-  if (nextScenarioBtn) nextScenarioBtn.innerHTML = '&#8594; Skenario Berikutnya';
+  if (nextScenarioBtn) nextScenarioBtn.textContent = '→ Skenario Berikutnya';
 
   var sampleAnswerBtn = document.querySelector('button[onclick="toggleSampleAnswer()"]');
-  if (sampleAnswerBtn) sampleAnswerBtn.innerHTML = '&#128161; Lihat Contoh Jawaban';
+  if (sampleAnswerBtn) sampleAnswerBtn.textContent = '💡 Lihat Contoh Jawaban';
 
   var speakSampleBtn = document.querySelector('button[onclick="speakSample()"]');
-  if (speakSampleBtn) speakSampleBtn.innerHTML = '&#128266; Dengar Contoh';
+  if (speakSampleBtn) speakSampleBtn.textContent = '🔊 Dengar Contoh';
 
-  // Navigation arrows — fix all step-nav buttons
+  var scStart = document.getElementById('btn-sc-start');
+  if (scStart) scStart.textContent = '⏺ Rekam Respons';
+
+  var scStop = document.getElementById('btn-sc-stop');
+  if (scStop) scStop.textContent = '⏹ Berhenti';
+
+  var finishBtn = document.querySelector('button[onclick="finishLevel()"]');
+  if (finishBtn) finishBtn.textContent = '✅ Selesai Level Ini';
+
+  // Fix refresh button
+  var refreshBtn = document.querySelector('button[onclick="loadFeedback()"]');
+  if (refreshBtn) refreshBtn.textContent = '↻ Refresh';
+
+  // Fix step nav arrows
   document.querySelectorAll('.step-nav button').forEach(function (btn) {
-    var txt = btn.textContent;
-    // "Kembali" buttons
-    if (txt.indexOf('Kembali') !== -1) {
-      btn.innerHTML = '&#8592; Kembali';
-    }
-    // "Lanjut ke Latihan" button
-    if (txt.indexOf('Lanjut ke Latihan') !== -1) {
-      btn.innerHTML = 'Lanjut ke Latihan &#8594;';
-    }
-    // "Lanjut ke Rekam" button
-    if (txt.indexOf('Lanjut ke Rekam') !== -1) {
-      btn.innerHTML = 'Lanjut ke Rekam &#8594;';
-    }
-    // "Lanjut ke Skenario" button
-    if (txt.indexOf('Lanjut ke Skenario') !== -1) {
-      btn.innerHTML = 'Lanjut ke Skenario &#8594;';
+    var txt = btn.textContent.trim();
+    if (txt.indexOf('Kembali') !== -1) btn.textContent = '← Kembali';
+    if (txt.indexOf('Lanjut ke Latihan') !== -1) btn.textContent = 'Lanjut ke Latihan →';
+    if (txt.indexOf('Lanjut ke Rekam') !== -1) btn.textContent = 'Lanjut ke Rekam →';
+    if (txt.indexOf('Lanjut ke Skenario') !== -1) btn.textContent = 'Lanjut ke Skenario →';
+  });
+
+  // Fix progress description
+  document.querySelectorAll('.section p').forEach(function (p) {
+    if (p.textContent.indexOf('Dengarkan') !== -1 && p.textContent.indexOf('Latihan') !== -1) {
+      p.textContent = 'Klik level untuk mulai belajar. Ikuti 4 tahap: Dengarkan → Latihan → Rekam → Skenario';
     }
   });
 
-  // Fix progress description text
-  var progressDesc = document.querySelector('.section p');
-  if (progressDesc && progressDesc.textContent.indexOf('Dengarkan') !== -1) {
-    progressDesc.textContent = 'Klik level untuk mulai belajar. Ikuti 4 tahap: Dengarkan \u2192 Latihan \u2192 Rekam \u2192 Skenario';
+  // Fix notification bell
+  var notifBtn = document.getElementById('notif-btn');
+  if (notifBtn) {
+    var badge = document.getElementById('notif-badge');
+    notifBtn.textContent = '🔔 ';
+    if (badge) notifBtn.appendChild(badge);
   }
 
-  // Fix learn panel title default text
-  var panelTitle = document.getElementById('learn-panel-title');
-  if (panelTitle) {
-    panelTitle.textContent = panelTitle.textContent.replace(/\s*â€"\s*/g, ' \u2013 ').replace(/â€"/g, '\u2013');
-  }
-
-  // Fix title tag
-  document.title = 'SpeakOn! \u2013 Dashboard Siswa';
+  // Fix page title
+  document.title = 'SpeakOn! – Dashboard Siswa';
 });
