@@ -470,20 +470,33 @@ async function loadAudioBlob(recId){
   const wrap = document.getElementById(`audio-wrap-${recId}`);
   if(!wrap) return;
   try{
-    const token = api.getAccessToken();
-    const resp  = await fetch(`/speakon/api/recordings/${recId}/stream`, {
+    const token   = api.getAccessToken();
+    // Deteksi base URL sama seperti api.js
+    const basePath = window.location.pathname.startsWith('/speakon/') ? '/speakon/api' : '/api';
+    const streamUrl = `${basePath}/recordings/${recId}/stream`;
+
+    const resp = await fetch(streamUrl, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    if(!resp.ok){ wrap.innerHTML = '<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio.</div>'; return; }
+
+    if(!resp.ok){
+      const errText = await resp.text().catch(()=>'');
+      wrap.innerHTML = `<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio (${resp.status}). ${errText}</div>`;
+      return;
+    }
+
     const blob = await resp.blob();
     const url  = URL.createObjectURL(blob);
-    wrap.innerHTML = `<audio controls style="width:100%;border-radius:6px">
-      <source src="${url}" type="audio/webm" />
-      <source src="${url}" type="audio/ogg" />
-      Browser tidak mendukung audio player.
-    </audio>`;
+    wrap.innerHTML = `
+      <div style="font-size:.78rem;color:#666;margin-bottom:.3rem">🎤 Rekaman Step 3 siswa:</div>
+      <audio controls style="width:100%;border-radius:6px;margin-top:.25rem">
+        <source src="${url}" type="audio/webm" />
+        <source src="${url}" type="audio/ogg" />
+        <source src="${url}" type="audio/mpeg" />
+        Browser tidak mendukung audio player.
+      </audio>`;
   }catch(e){
-    wrap.innerHTML = '<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio: ' + e.message + '</div>';
+    wrap.innerHTML = `<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio: ${e.message}</div>`;
   }
 }
 
