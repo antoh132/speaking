@@ -336,6 +336,7 @@
 <script src="frontend/js/i18n.js"></script>
 <script src="frontend/js/api.js"></script>
 <script src="frontend/js/auth.js"></script>
+<script src="frontend/js/fix-icons.js"></script>
 <script>
 auth.requireAuth(['siswa']);
 const me = auth.getCurrentUser();
@@ -1216,3 +1217,56 @@ async function loadHistoryAudio(recId){
 
 
 
+
+<script>
+// Fix broken emoji/icons caused by encoding issue
+document.addEventListener('DOMContentLoaded', function() {
+  // Map of broken text -> correct emoji
+  var fixes = [
+    // Bell icon in nav
+    [/\uFFFD\uFFFD"/, '🔔'],
+    // Arrows
+    [/â†'/g, '→'],
+    [/â†/g, '←'],
+    [/â†»/g, '↻'],
+    // Checkmark & X
+    [/âœ…/g, '✅'],
+    [/âœ•/g, '✕'],
+    // Play/stop/record buttons
+    [/â–¶/g, '▶'],
+    [/âº/g, '⏺'],
+    [/â¹/g, '⏹'],
+    [/â¬†/g, '⬆'],
+    // Emoji icons
+    [/ðŸ"Š/g, '🔊'],
+    [/ðŸ""/g, '🔔'],
+    [/ðŸ'¬/g, '💬'],
+    [/ðŸŽ¤/g, '🎤'],
+    [/ðŸ"/g, '📝'],
+    [/ðŸŽ­/g, '🎭'],
+    [/ðŸ'¡/g, '💡'],
+    [/âœï¸/g, '✏️'],
+    // Em dash in titles
+    [/â€"/g, '–'],
+  ];
+
+  // Fix all text nodes in the document
+  function fixNode(node) {
+    if (node.nodeType === 3) { // Text node
+      var text = node.nodeValue;
+      var changed = false;
+      fixes.forEach(function(pair) {
+        if (pair[0].test(text)) {
+          text = text.replace(pair[0], pair[1]);
+          changed = true;
+        }
+      });
+      if (changed) node.nodeValue = text;
+    } else {
+      node.childNodes.forEach(fixNode);
+    }
+  }
+
+  fixNode(document.body);
+});
+</script>
