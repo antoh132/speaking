@@ -933,6 +933,8 @@ async function startTaskRec(idx){
       document.getElementById(`task-btn-redo-${idx}`).style.display = 'inline-block';
       document.getElementById(`task-btn-start-${idx}`).style.display = 'none';
       stream.getTracks().forEach(t => t.stop());
+      // Auto-upload task recording ke server
+      uploadTaskRecording(idx, blob, mimeType || 'audio/webm');
     };
 
     mr.start();
@@ -975,6 +977,24 @@ function redoTaskRec(idx){
   document.getElementById(`task-rec-status-${idx}`).textContent  = '';
   document.getElementById(`task-rec-status-${idx}`).className    = 'task-rec-status';
   if(taskRecorders[idx]) taskRecorders[idx].blob = null;
+}
+
+async function uploadTaskRecording(idx, blob, mimeType){
+  if(!currentLevelId) return;
+  const statusEl = document.getElementById(`task-rec-status-${idx}`);
+  try {
+    const ext = mimeType.includes('ogg') ? 'ogg' : mimeType.includes('mp3') ? 'mp3' : 'webm';
+    const formData = new FormData();
+    formData.append('audio', blob, `task_${idx}.${ext}`);
+    formData.append('level_id', currentLevelId);
+    formData.append('task_index', idx);
+    await api.upload('/recordings', formData);
+    statusEl.textContent = '✅ Rekaman tersimpan di server';
+    statusEl.className = 'task-rec-status done';
+  } catch(e) {
+    // Tidak tampilkan error ke user — rekaman tetap bisa didengar secara lokal
+    console.warn('Task recording upload failed:', e);
+  }
 }
 
 async function uploadRecording(){

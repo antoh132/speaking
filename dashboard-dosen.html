@@ -307,7 +307,10 @@ async function loadRecordings(){
     });
 
     renderRecordings(filtered);
-    filtered.forEach(rec => loadAudioBlob(rec.id));
+    filtered.forEach(rec => {
+      loadAudioBlob(rec.id);         // Step 3 main recording
+      loadTaskAudioBlobs(rec.id, rec.level_order || rec.level_id); // Step 2 task recordings
+    });
   }catch(e){
     document.getElementById('rec-list').innerHTML = `<div class="empty-state" style="color:#c62828">Gagal memuat: ${e.message||'Error'}</div>`;
   }
@@ -372,6 +375,12 @@ function renderRecordings(recs){
                   <div style="font-size:.75rem;font-weight:700;color:#6a1b9a">${t.label}</div>
                   <div style="font-size:.83rem;color:#333;margin-top:.2rem">${t.prompt}</div>
                 </div>`).join('')}
+              <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px dashed #ce93d8">
+                <div style="font-size:.75rem;font-weight:700;color:#6a1b9a;margin-bottom:.4rem">🎤 Rekaman Latihan Siswa:</div>
+                <div id="task-audio-0-${rec.id}"><span style="font-size:.78rem;color:#888">⏳ Memuat Latihan 1...</span></div>
+                <div id="task-audio-1-${rec.id}" style="margin-top:.3rem"><span style="font-size:.78rem;color:#888">⏳ Memuat Latihan 2...</span></div>
+                <div id="task-audio-2-${rec.id}" style="margin-top:.3rem"><span style="font-size:.78rem;color:#888">⏳ Memuat Latihan 3...</span></div>
+              </div>
             </div>`;
         } else if(s.num === 3){
           soalHtml = `
@@ -509,6 +518,57 @@ async function loadAudioBlob(recId){
       </audio>`;
   }catch(e){
     wrap.innerHTML = `<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio: ${e.message}</div>`;
+  }
+}
+
+// ── Load task audio recordings (Step 2) ──────────────────────────────────────
+async function loadTaskAudioBlobs(mainRecId, levelNum){
+  const basePath  = window.location.pathname.startsWith('/speakon/') ? '/speakon/api' : '/api';
+  const token     = api.getAccessToken();
+  const content   = LEVEL_CONTENT[levelNum];
+  const taskLabels = content?.tasks?.map(t => t.label) || ['Latihan 1','Latihan 2','Latihan 3'];
+
+  try {
+    const r = await api.get('/recordings', { limit: 200 });
+    const allRecs = r.data.recordings;
+    const mainRec = allRecs.find(rec => rec.id === mainRecId);
+    if(!mainRec) return;
+
+    for(let i = 0; i < 3; i++){
+      const wrap = document.getElementById(`task-audio-${i}-${mainRecId}`);
+      if(!wrap) continue;
+
+      const taskRec = allRecs.find(rec =>
+        rec.student_id === mainRec.student_id &&
+        rec.level_id   === mainRec.level_id &&
+        rec.task_index == i &&
+        rec.is_current == 1
+      );
+
+      if(!taskRec){
+        wrap.innerHTML = `<div style="font-size:.78rem;color:#bbb;padding:.2rem 0">— ${taskLabels[i]}: belum direkam</div>`;
+        continue;
+      }
+
+      try {
+        const resp = await fetch(`${basePath}/recordings/${taskRec.id}/stream`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(!resp.ok){ wrap.innerHTML = `<div style="font-size:.78rem;color:#c62828">⚠️ Gagal load ${taskLabels[i]}</div>`; continue; }
+        const blob = await resp.blob();
+        const url  = URL.createObjectURL(blob);
+        wrap.innerHTML = `
+          <div style="font-size:.75rem;font-weight:600;color:#6a1b9a;margin-bottom:.2rem">${taskLabels[i]}:</div>
+          <audio controls style="width:100%;height:34px;border-radius:5px">
+            <source src="${url}" type="audio/webm"/>
+            <source src="${url}" type="audio/ogg"/>
+          </audio>`;
+      } catch(e) {
+        wrap.innerHTML = `<div style="font-size:.78rem;color:#c62828">⚠️ ${e.message}</div>`;
+      }
+    }
+  } catch(e) {
+    console.warn('loadTaskAudioBlobs error:', e);
   }
 }
 
