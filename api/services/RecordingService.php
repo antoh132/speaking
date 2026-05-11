@@ -164,9 +164,6 @@ class RecordingService
     public static function getRecordingById(string $recordingId): ?array
     {
         $pdo  = getDB();
-    public static function getRecordingById(string $recordingId): ?array
-    {
-        $pdo  = getDB();
 
         // Check if task_index column exists
         $hasTaskIndex = false;
