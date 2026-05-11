@@ -101,6 +101,27 @@ document.addEventListener('DOMContentLoaded', function () {
     if (badge) notifBtn.appendChild(badge);
   }
 
+  // Fix step tab labels
+  var tab1span = document.querySelector('#tab-1 span:last-child');
+  if (tab1span) tab1span.textContent = ' 🎧 Dengarkan';
+
+  var tab2span = document.querySelector('#tab-2 span:last-child');
+  if (tab2span) tab2span.textContent = ' ✏️ Latihan';
+
+  var tab3span = document.querySelector('#tab-3 span:last-child');
+  if (tab3span) tab3span.textContent = ' 🎤 Rekam';
+
+  var tab4span = document.querySelector('#tab-4 span:last-child');
+  if (tab4span) tab4span.textContent = ' 🎭 Skenario';
+
+  // Fix learn panel title em-dash
+  var panelTitle = document.getElementById('learn-panel-title');
+  if (panelTitle) {
+    panelTitle.textContent = panelTitle.textContent
+      .replace(/\s*â€"\s*/g, ' – ')
+      .replace(/â€"/g, '–');
+  }
+
   // Fix page title
   document.title = 'SpeakOn! – Dashboard Siswa';
 });
