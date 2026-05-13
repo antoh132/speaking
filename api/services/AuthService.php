@@ -97,9 +97,6 @@ class AuthService
         $stmt->execute([':email' => $email]);
         $user = $stmt->fetch();
 
-        var_dump($user, $email); 
-        die();
-
         // 3. Verify user exists and account is active
         if (!$user) {
             // Record failed attempt even for non-existent emails (prevents enumeration timing)
