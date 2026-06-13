@@ -17,7 +17,7 @@ defined('DB_HOST')    || define('DB_HOST',    getenv('DB_HOST')    ?: 'localhost
 defined('DB_PORT')    || define('DB_PORT',    getenv('DB_PORT')    ?: '3306');
 defined('DB_NAME')    || define('DB_NAME',    getenv('DB_NAME')    ?: 'speakon_db');
 defined('DB_USER')    || define('DB_USER',    getenv('DB_USER')    ?: 'root');
-defined('DB_PASS')    || define('DB_PASS',    getenv('DB_PASS')    ?: 'Hardiansyah_23');
+defined('DB_PASS')    || define('DB_PASS',    getenv('DB_PASS')    ?: '');
 defined('DB_CHARSET') || define('DB_CHARSET', 'utf8mb4');
 
 // ── JWT ───────────────────────────────────────────────────────────────────────
