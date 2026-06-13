@@ -32,8 +32,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
+      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -43,13 +42,15 @@
     }
 
     .nav-logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--blue);
       display: flex;
       align-items: center;
-      gap: .4rem;
       text-decoration: none;
+    }
+
+    .nav-logo img {
+      height: 56px;
+      width: auto;
+      object-fit: contain;
     }
 
     .nav-links {
@@ -75,7 +76,7 @@
       border-radius: 8px;
       padding: .55rem 1.4rem;
       font-size: .92rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       text-decoration: none;
       transition: background .2s, transform .15s;
@@ -225,16 +226,25 @@
       position: relative;
       z-index: 1;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-card-wrap {
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
     }
 
     .hero-card {
-      background: rgba(255,255,255,.12);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,.2);
+      background: #ffffff;
+      border: none;
       border-radius: 20px;
       padding: 2rem;
-      width: 320px;
+      width: 280px;
       text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     }
 
     .hero-card .big-icon { font-size: 5rem; margin-bottom: 1rem; }
@@ -243,11 +253,12 @@
       font-size: 1.1rem;
       font-weight: 700;
       margin-bottom: .5rem;
+      color: #ffd54f;
     }
 
     .hero-card p {
       font-size: .85rem;
-      opacity: .8;
+      color: #555;
       margin-bottom: 0;
     }
 
@@ -260,7 +271,7 @@
 
     .hero-stat { text-align: center; }
     .hero-stat .num { font-size: 1.5rem; font-weight: 800; color: #ffd54f; }
-    .hero-stat .lbl { font-size: .72rem; opacity: .8; }
+    .hero-stat .lbl { font-size: .72rem; color: #333; font-weight: 600; }
 
     /* ── ROLES SECTION ── */
     .roles-section {
@@ -513,7 +524,10 @@
         text-align: center;
       }
       .hero-actions { justify-content: center; }
-      .hero-visual { display: none; }
+      .hero-card-wrap { margin-top: 1.5rem; }
+      .hero-card { width: 100%; }
+      .hero-visual { margin-top: 1.5rem; }
+      .hero-visual img { width: 220px; }
       .step-arrow { display: none; }
       .steps-row { gap: 1.5rem; }
     }
@@ -523,7 +537,9 @@
 
   <!-- ── NAVBAR ── -->
   <nav class="navbar">
-    <a href="#" class="nav-logo">🎙️ SpeakOn!</a>
+    <a href="#" class="nav-logo">
+      <img src="/speakon/frontend/images/logo-text.jpeg" alt="SpeakOn! Logo" />
+    </a>
     <div class="nav-links" id="nav-links">
       <a href="#tentang">Tentang</a>
       <a href="#fitur">Fitur</a>
@@ -548,17 +564,13 @@
     </div>
     <div class="hero-visual">
       <div class="hero-card">
-        <div class="big-icon">🗣️</div>
+        <img src="/speakon/frontend/images/logo-dark.png" alt="SpeakOn!" style="width:180px;height:auto;object-fit:contain;margin-bottom:.75rem;border-radius:10px" />
         <h3>Rekam & Dapatkan Feedback</h3>
         <p>Upload rekaman suaramu dan terima penilaian dari dosen secara langsung</p>
         <div class="hero-stats">
           <div class="hero-stat">
             <div class="num">5</div>
             <div class="lbl">Level</div>
-          </div>
-          <div class="hero-stat">
-            <div class="num">3</div>
-            <div class="lbl">Peran</div>
           </div>
           <div class="hero-stat">
             <div class="num">∞</div>
@@ -703,15 +715,17 @@
       if (token && user) {
         try {
           const u = JSON.parse(user);
+          // Deteksi base path otomatis dari subfolder
+          const match = window.location.pathname.match(/^(\/[^/]+\/)/);
+          const base  = match ? match[1].replace(/\/$/, '') : '';
           const paths = {
-            superadmin: '/speakon/dashboard-superadmin.html',
-            dosen:      '/speakon/dashboard-dosen.html',
-            siswa:      '/speakon/dashboard-siswa.html',
+            superadmin: base + '/dashboard-superadmin.html',
+            dosen:      base + '/dashboard-dosen.html',
+            siswa:      base + '/dashboard-siswa.html',
           };
           const dashPath = paths[u.role];
           if (dashPath) {
-            // Update all login buttons to go to dashboard
-            document.querySelectorAll('a[href="login.html"], a[href="/speakon/login.html"]').forEach(btn => {
+            document.querySelectorAll('a[href="login.html"]').forEach(btn => {
               btn.href = dashPath;
               btn.textContent = '🏠 Dashboard';
             });

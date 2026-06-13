@@ -12,13 +12,14 @@
 const api = (() => {
   /**
    * Base URL — otomatis deteksi environment:
-   * - XAMPP lokal: /speakon/api
-   * - InfinityFree/hosting root: /api
+   * - XAMPP lokal subfolder (misal /speaking/, /speakon/): /{subfolder}/api
+   * - Root domain (hosting): /api
    */
   const BASE_URL = (() => {
     const path = window.location.pathname;
-    // Jika diakses dari subfolder /speakon/
-    if (path.startsWith('/speakon/')) return '/speakon/api';
+    // Deteksi subfolder otomatis (misal /speaking/ atau /speakon/)
+    const match = path.match(/^(\/[^/]+\/)/);
+    if (match) return match[1].replace(/\/$/, '') + '/api';
     // Jika di root domain (hosting)
     return '/api';
   })();

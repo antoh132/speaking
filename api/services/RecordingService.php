@@ -32,7 +32,7 @@ class RecordingService
      * @return array              The newly created recording record.
      * @throws RuntimeException   On validation failure or storage error.
      */
-    public static function uploadRecording(string $studentId, string $levelId, array $file, ?int $taskIndex = null): array
+    public static function uploadRecording(string $studentId, string $levelId, array $file, ?int $taskIndex = null, ?int $attemptNumber = null): array
     {
         // Validate file was uploaded without errors
         if ($file['error'] !== UPLOAD_ERR_OK) {
@@ -139,17 +139,18 @@ class RecordingService
 
         $insertStmt = $pdo->prepare(
             'INSERT INTO recordings
-                (id, student_id, level_id, file_path, file_size_bytes, duration_seconds, uploaded_at, is_current, task_index)
+                (id, student_id, level_id, file_path, file_size_bytes, duration_seconds, uploaded_at, is_current, task_index, attempt_number)
              VALUES
-                (:id, :student_id, :level_id, :file_path, :file_size, NULL, NOW(), 1, :task_index)'
+                (:id, :student_id, :level_id, :file_path, :file_size, NULL, NOW(), 1, :task_index, :attempt_number)'
         );
         $insertStmt->execute([
-            ':id'         => $recordingId,
-            ':student_id' => $studentId,
-            ':level_id'   => $levelId,
-            ':file_path'  => $relPath,
-            ':file_size'  => $file['size'],
-            ':task_index' => $taskIndex,
+            ':id'             => $recordingId,
+            ':student_id'     => $studentId,
+            ':level_id'       => $levelId,
+            ':file_path'      => $relPath,
+            ':file_size'      => $file['size'],
+            ':task_index'     => $taskIndex,
+            ':attempt_number' => $attemptNumber,
         ]);
 
         return self::getRecordingById($recordingId);
@@ -172,12 +173,20 @@ class RecordingService
             $hasTaskIndex = $check->rowCount() > 0;
         } catch (\Exception $e) {}
 
+        // Check if attempt_number column exists
+        $hasAttemptNumber = false;
+        try {
+            $check = $pdo->query("SHOW COLUMNS FROM recordings LIKE 'attempt_number'");
+            $hasAttemptNumber = $check->rowCount() > 0;
+        } catch (\Exception $e) {}
+
         $taskIndexSelect = $hasTaskIndex ? 'r.task_index' : 'NULL AS task_index';
+        $attemptSelect   = $hasAttemptNumber ? 'r.attempt_number' : 'NULL AS attempt_number';
 
         $stmt = $pdo->prepare(
             "SELECT r.id, r.student_id, r.level_id, r.file_path, r.file_size_bytes,
                     r.duration_seconds, r.uploaded_at, r.is_current,
-                    {$taskIndexSelect},
+                    {$taskIndexSelect}, {$attemptSelect},
                     u.full_name AS student_name,
                     l.name AS level_name, l.order_index AS level_order
                FROM recordings r
@@ -236,11 +245,19 @@ class RecordingService
             $hasTaskIndex = $check->rowCount() > 0;
         } catch (\Exception $e) {}
 
+        // Check if attempt_number column exists
+        $hasAttemptNumber = false;
+        try {
+            $check = $pdo->query("SHOW COLUMNS FROM recordings LIKE 'attempt_number'");
+            $hasAttemptNumber = $check->rowCount() > 0;
+        } catch (\Exception $e) {}
+
         $taskIndexSelect = $hasTaskIndex ? 'r.task_index' : 'NULL AS task_index';
+        $attemptSelect   = $hasAttemptNumber ? 'r.attempt_number' : 'NULL AS attempt_number';
 
         $sql = "SELECT r.id, r.student_id, r.level_id, r.file_path, r.file_size_bytes,
                        r.duration_seconds, r.uploaded_at, r.is_current,
-                       {$taskIndexSelect},
+                       {$taskIndexSelect}, {$attemptSelect},
                        u.full_name AS student_name,
                        l.name AS level_name, l.order_index AS level_order
                   FROM recordings r

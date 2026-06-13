@@ -9,7 +9,8 @@
     body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#333}
     /* NAV */
     nav{background:#1a73e8;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-    nav .brand{font-size:1.3rem;font-weight:700}
+    nav .brand{display:flex;align-items:center}
+    nav .brand img{height:52px;width:auto;object-fit:contain}
     nav .nav-right{display:flex;align-items:center;gap:.75rem}
     .btn{padding:.45rem .9rem;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:opacity .2s}
     .btn:hover{opacity:.85}
@@ -142,7 +143,9 @@
 <body>
 
 <nav>
-  <span class="brand">SpeakOn!</span>
+  <span class="brand">
+    <img src="/speakon/frontend/images/logo-text.jpeg" alt="SpeakOn!" />
+  </span>
   <div class="nav-right">
     <span id="nav-username" style="font-size:.9rem;opacity:.9"></span>
     <button class="notif-btn" onclick="toggleNotifPanel()" id="notif-btn" aria-label="Notifikasi">
@@ -216,11 +219,11 @@
         <div class="model-sentence" id="model-sentence">Memuat...</div>
         <div class="speed-row">
           <span class="speed-label">Kecepatan:</span>
-          <button class="speed-btn active-speed" onclick="setSpeed(1,this)">Normal</button>
-          <button class="speed-btn" onclick="setSpeed(0.7,this)">Lambat</button>
-          <button class="speed-btn" onclick="setSpeed(0.4,this)">Sangat Lambat</button>
+          <button class="speed-btn active-speed" onclick="setSpeed(0.9,this)">Normal</button>
+          <button class="speed-btn" onclick="setSpeed(0.55,this)">Lambat</button>
+          <button class="speed-btn" onclick="setSpeed(0.3,this)">Sangat Lambat</button>
         </div>
-        <button class="btn-play" onclick="playModel()">â–¶ Putar Audio</button>
+        <button class="btn-play" id="btn-play-model" onclick="playModel()">▶ Putar Audio</button>
       </div>
 
       <div class="dialogue-box">
@@ -339,6 +342,20 @@
 <script src="frontend/js/fix-icons.js"></script>
 <script>
 auth.requireAuth(['siswa']);
+
+// Tambahkan tombol upload skenario secara dinamis (menghindari encoding issue)
+document.addEventListener('DOMContentLoaded', () => {
+  const stopBtn = document.getElementById('btn-sc-stop');
+  if(stopBtn && !document.getElementById('btn-sc-upload')){
+    const uploadBtn = document.createElement('button');
+    uploadBtn.className = 'btn btn-success btn-sm';
+    uploadBtn.id = 'btn-sc-upload';
+    uploadBtn.style.display = 'none';
+    uploadBtn.textContent = '⬆ Upload Skenario';
+    uploadBtn.onclick = uploadScenarioRec;
+    stopBtn.parentNode.insertBefore(uploadBtn, stopBtn.nextSibling);
+  }
+});
 const me = auth.getCurrentUser();
 document.getElementById('nav-username').textContent = me?.fullName || me?.email || '';
 i18n.init(me?.languagePref);
@@ -350,230 +367,230 @@ function switchLang(l){
 }
 function fmtDate(d){ return d ? new Date(d).toLocaleString('id-ID') : '—'; }
 
-// ── CONTENT DATA per level — Standar SMA (Kurikulum Merdeka) ─────────────────
-// Level 1: Greeting & Self-Introduction (Kelas X)
-// Level 2: Asking & Giving Information (Kelas X)
-// Level 3: Expressing Opinions & Suggestions (Kelas XI)
-// Level 4: Narrative & Descriptive Speaking (Kelas XI)
-// Level 5: Analytical Exposition & Discussion (Kelas XII)
+// ── CONTENT DATA per level — Kurikulum Merdeka SMA ───────────────────────────
+// Level 1: Descriptive Text — Great Athletes (Kelas X, materi2: Work in Progress)
+// Level 2: Recount Text — Sports Events (Kelas X, materi2: Work in Progress)
+// Level 3: Analytical Exposition — Digital Literacies & Opinions (Kelas XI, materi3: English for Change)
+// Level 4: Hortatory Exposition — Environment & Healthy Life (Kelas XI, materi3: English for Change)
+// Level 5: Narrative + Argumentative — Renewable Energy & E-Money (Kelas XII, materi1/4: Life Today)
 const LEVEL_CONTENT = {
   1: {
-    topic: "Greeting & Self-Introduction",
-    model: "Good morning! My name is Andi Pratama. I am a student at SMA Muhammadiyah. I am sixteen years old and I live in Purwokerto. Nice to meet you!",
+    topic: "Descriptive Text — Great Athletes",
+    model: "Anthony Sinisuka Ginting is one of Indonesia's greatest badminton players. He has a strong and athletic build, standing about 178 centimeters tall. He is known for his incredible speed, powerful smashes, and great determination on the court. He has represented Indonesia in many international tournaments and won numerous medals for his country.",
     dialogue: [
-      {s:"A", t:"Good morning! I'm new here. My name is Sari."},
-      {s:"B", t:"Good morning, Sari! Welcome! I'm Andi. Nice to meet you."},
-      {s:"A", t:"Nice to meet you too, Andi. What class are you in?"},
-      {s:"B", t:"I'm in class ten, science program. How about you?"},
-      {s:"A", t:"Me too! I think we're classmates then."},
-      {s:"B", t:"Great! Let me introduce you to our other friends."}
+      {s:"A", t:"Who do you think is a great athlete?"},
+      {s:"B", t:"I think Cristiano Ronaldo is one of the greatest athletes in the world."},
+      {s:"A", t:"What makes him so great?"},
+      {s:"B", t:"He has incredible determination. He trained very hard since childhood and never gave up."},
+      {s:"A", t:"What about his physical abilities?"},
+      {s:"B", t:"He can run at 33.6 kilometers per hour and jump 78 centimeters in the air. He is truly extraordinary!"}
     ],
     tasks: [
       {
-        label:"Latihan 1 — Sapa dan Perkenalkan Diri",
-        prompt:'Ucapkan salam dan perkenalkan dirimu: nama, kelas, asal, dan satu hal tentang dirimu.',
-        hint:'Contoh: "Good morning! My name is... I am in class... I am from... I like..."'
+        label:"Latihan 1 — Describe an Athlete's Appearance",
+        prompt:"Describe the physical appearance of your favorite athlete. Include: height, build, skin color, hair, and any distinctive features. Use adjectives and adverbs.",
+        hint:'Use: He/She has... / He/She is... / His/Her hair is... / He/She stands about... tall. Example: "He has a muscular build with short black hair and dark eyes."'
       },
       {
-        label:"Latihan 2 — Tanya Jawab Perkenalan",
-        prompt:'Bayangkan kamu bertemu teman baru. Ucapkan: (1) salam, (2) perkenalan diri, (3) tanya nama teman, (4) ungkapkan senang berkenalan.',
-        hint:'Gunakan: What is your name? / Where are you from? / Nice to meet you!'
+        label:"Latihan 2 — Describe an Athlete's Qualities",
+        prompt:"Describe the personality and qualities that make your favorite athlete great. Give at least 3 qualities with examples or evidence.",
+        hint:'Use: He/She is known for... / One of his/her greatest qualities is... / He/She demonstrates... Example: "She is known for her perseverance. Despite many injuries, she always came back stronger."'
       },
       {
-        label:"Latihan 3 — Perkenalan Formal",
-        prompt:'Perkenalkan dirimu secara formal seolah kamu sedang presentasi di depan kelas (minimal 5 kalimat).',
-        hint:'Mulai dengan: "Good morning, everyone. Allow me to introduce myself..."'
+        label:"Latihan 3 — Full Descriptive Monologue",
+        prompt:"Give a complete description of a great Indonesian athlete (e.g., Greysia Polii, Leani Ratri Oktila, or Boaz Solossa). Include: who they are, their appearance, their achievements, and why they inspire you.",
+        hint:"Structure: Identification (who) → Physical description → Personality/qualities → Achievements → Why they inspire you. Speak for at least 45 seconds."
       }
     ],
-    recPrompt: "Introduce yourself formally in front of the class. Include your name, age, school, hobbies, and your dream for the future. Speak for at least 30 seconds.",
+    recPrompt: "Describe your favorite athlete in detail. Talk about their appearance, personality, achievements, and what makes them a great athlete. Use descriptive adjectives and adverbs. Speak for at least 45 seconds.",
     scenarios: [
       {
-        tag:"Perkenalan Baru",
-        text:"Kamu adalah siswa baru di sekolah. Guru memintamu memperkenalkan diri di depan kelas. Apa yang kamu katakan?",
-        hint:"Sertakan: nama, asal, hobi, harapan di sekolah baru",
-        answer:"Good morning, everyone. My name is Andi Pratama. I am from Purwokerto. I like playing football and reading books. I hope I can make many new friends here and study hard together. Thank you."
+        tag:"Guess Who Game",
+        text:"Describe a famous athlete without saying their name. Include their sport, nationality, physical appearance, and 2 key achievements. Your listener should be able to guess who it is.",
+        hint:"Start with: This athlete plays... / This person is from... / He/She is known for... Do NOT say the name directly.",
+        answer:"This athlete plays badminton and represents Indonesia. He is tall with a slim but athletic build. He is known for his lightning-fast footwork and powerful smashes. He has won multiple gold medals at international tournaments including the All England Open. He is one of the most feared players in the world right now."
       },
       {
-        tag:"Bertemu Tamu",
-        text:"Ada tamu dari sekolah lain yang berkunjung. Kamu diminta menyambut dan memperkenalkan diri sebagai perwakilan kelas.",
-        hint:"Gunakan: Welcome to our school / On behalf of / It is my pleasure",
-        answer:"Good afternoon and welcome to our school. My name is Andi, and I am the class representative. On behalf of my classmates, it is my pleasure to welcome you here today."
+        tag:"Inspiring Athlete Story",
+        text:"Tell the story of Leani Ratri Oktila, a Paralympic badminton champion from Indonesia. She had an accident at age 20 that shortened her left leg, but she came back to win gold at Tokyo 2020. Why does her story inspire you?",
+        hint:"Include: What happened → How she overcame it → What she achieved → What you learned from her story",
+        answer:"Leani Ratri Oktila is a truly inspiring athlete. At the age of 20, she had a motorcycle accident that left her left leg seven centimeters shorter than the other. Many people thought her sports career was over. However, encouraged by her family and inspired by other Paralympians, she picked up her racket again. She went on to win a historic double gold at the Tokyo 2020 Paralympic Games. Her story teaches us that determination and courage can overcome any obstacle in life."
       }
     ]
   },
   2: {
-    topic: "Asking & Giving Information",
-    model: "Excuse me, could you tell me how to get to the library? Sure! Go straight ahead, then turn left at the second corridor. The library is on your right.",
+    topic: "Recount Text — Sports Events",
+    model: "Last Saturday, I had an amazing experience watching a live badminton tournament at the sports hall. The atmosphere was electric. Thousands of fans were cheering loudly. I could see, hear, smell, and feel the excitement all around me. It was one of the most memorable experiences of my life.",
     dialogue: [
-      {s:"A", t:"Excuse me, I'm looking for the science laboratory. Could you help me?"},
-      {s:"B", t:"Of course! Go straight down this hallway and turn right at the end."},
-      {s:"A", t:"Is it far from here?"},
-      {s:"B", t:"Not really. It's just about two minutes walk from here."},
-      {s:"A", t:"Thank you so much. By the way, what time does the lab open?"},
-      {s:"B", t:"It opens at seven thirty in the morning and closes at four in the afternoon."}
+      {s:"A", t:"Did you watch the football match last night?"},
+      {s:"B", t:"Yes, I did! It was absolutely thrilling. The stadium was packed with supporters."},
+      {s:"A", t:"What was the atmosphere like?"},
+      {s:"B", t:"It was incredible. I could hear the roar of the crowd and smell the fresh grass on the field."},
+      {s:"A", t:"What was the most exciting moment?"},
+      {s:"B", t:"When our team scored the winning goal in the last minute! Everyone jumped up and screamed with joy."}
     ],
     tasks: [
       {
-        label:"Latihan 1 — Meminta Informasi",
-        prompt:'Ucapkan 3 cara berbeda untuk meminta informasi tentang jadwal pelajaran.',
-        hint:'Gunakan: Could you tell me...? / Do you know...? / I would like to know...'
+        label:"Latihan 1 — Describe a Sports Event Using 5 Senses",
+        prompt:"Describe a sports event you have watched (live or on TV) using all 5 senses: what you SAW, HEARD, SMELLED, TASTED, and FELT. Use past tense.",
+        hint:'Use: I saw... / I heard... / I could smell... / I felt... / The crowd was... Example: "I saw thousands of fans waving flags. I heard the deafening roar of the crowd."'
       },
       {
-        label:"Latihan 2 — Memberi Petunjuk Arah",
-        prompt:'Jelaskan arah dari gerbang sekolah ke ruang kepala sekolah dengan jelas.',
-        hint:'Gunakan: Go straight / Turn left/right / It is next to / You will see...'
+        label:"Latihan 2 — Recount a Sports Experience",
+        prompt:"Recount your personal experience of watching or participating in a sports event. Include: when and where it happened, what you did, what happened, and how you felt.",
+        hint:"Use past tense: went, watched, cheered, felt, saw, heard. Time connectives: First... Then... After that... Finally... In the end..."
       },
       {
-        label:"Latihan 3 — Tanya Jawab Informasi",
-        prompt:'Bayangkan kamu adalah petugas informasi sekolah. Jawab pertanyaan: "What time does the school start? Where is the canteen? When is the English class?"',
-        hint:'Jawab dengan lengkap dan sopan menggunakan kalimat penuh.'
+        label:"Latihan 3 — Compare Two Sports Events",
+        prompt:"Compare two sports events you have experienced or know about. Describe the differences in atmosphere, excitement, and your personal feelings about each one.",
+        hint:"Use: While... / On the other hand... / Compared to... / Both events... / However... / The first event was... whereas the second..."
       }
     ],
-    recPrompt: "You are a new student asking for information. Ask about: (1) where the library is, (2) what time it opens, and (3) how to borrow a book. Speak naturally as if talking to a real person.",
+    recPrompt: "Recount your most exciting experience watching or participating in a sports event. Use the 5 senses to describe the atmosphere. Include what happened, how you felt, and why it was memorable. Use past tense throughout.",
     scenarios: [
       {
-        tag:"Tamu Sekolah",
-        text:"Seorang tamu asing datang ke sekolahmu dan bertanya: 'Excuse me, where can I find the principal's office?' Bantu dia dengan petunjuk yang jelas.",
-        hint:"Gunakan: Go straight / Turn left / Take the stairs / It is on the second floor",
-        answer:"Sure! Please go straight along this corridor. When you reach the end, turn left and take the stairs to the second floor. The principal's office is the first room on your right. You can't miss it."
+        tag:"Cerita Pengalaman Olahraga",
+        text:"Kamu baru saja menonton pertandingan olahraga yang sangat seru. Ceritakan pengalamanmu kepada temanmu menggunakan 5 indera dan past tense.",
+        hint:"Gunakan: I went to... / The stadium was... / I could see/hear/smell... / When... happened, I felt... / It was the most... experience",
+        answer:"Last Sunday, I went to watch a badminton tournament at the local sports hall. The hall was packed with excited fans. I could see players warming up on the court and hear the sound of shuttlecocks being hit. The atmosphere smelled of sweat and excitement. When the Indonesian player won the final point, I felt an incredible rush of joy. Everyone around me jumped up and cheered. It was one of the most thrilling experiences I have ever had."
       },
       {
-        tag:"Informasi Kegiatan",
-        text:"Temanmu dari sekolah lain bertanya tentang kegiatan ekstrakurikuler di sekolahmu. Jelaskan minimal 3 kegiatan yang ada.",
-        hint:"Gunakan: We have... / It is held every... / You can join if...",
-        answer:"We have several extracurricular activities. First, we have a football club which meets every Tuesday and Thursday. Second, there is an English debate club on Wednesdays. Third, we have a music club that practices on Fridays. You are welcome to join any of them."
+        tag:"Paralympic Games Story",
+        text:"Ceritakan tentang Paralympic Games — apa itu, mengapa penting, dan bagaimana atlet Paralympic menginspirasi kamu.",
+        hint:"Mulai dengan: The Paralympic Games is/are... / I first learned about... / What impressed me most was... / I believe...",
+        answer:"The Paralympic Games is an international multi-sport event for athletes with disabilities. I first learned about it when I watched Leani Ratri Oktila win gold at Tokyo 2020. What impressed me most was her incredible determination despite her physical challenges. She competed against the best in the world and won. I believe the Paralympic Games teaches us that the human spirit can overcome any limitation. These athletes are true heroes."
       }
     ]
   },
   3: {
-    topic: "Expressing Opinions & Suggestions",
-    model: "In my opinion, students should limit their screen time because spending too much time on social media can affect their concentration and sleep quality.",
+    topic: "Analytical Exposition — Digital Literacies & Opinions",
+    model: "In my opinion, digital literacy is one of the most important skills for young people today. First, it helps us access and evaluate information critically. Second, it enables us to communicate effectively in digital spaces. Therefore, schools should prioritize teaching digital literacy alongside traditional subjects.",
     dialogue: [
-      {s:"A", t:"What do you think about the new school regulation about mobile phones?"},
-      {s:"B", t:"Personally, I think it's a good idea. Students tend to be more focused in class."},
-      {s:"A", t:"I see your point, but don't you think it limits students' freedom?"},
-      {s:"B", t:"That's a valid concern. However, I believe the benefits outweigh the drawbacks."},
-      {s:"A", t:"What would you suggest as a compromise?"},
-      {s:"B", t:"I suggest allowing phones only during break time. That way, students can stay connected but still focus on learning."}
+      {s:"A", t:"What do you think about students using social media for learning?"},
+      {s:"B", t:"Personally, I think it can be very beneficial if used wisely."},
+      {s:"A", t:"I agree. But don't you think it can also be distracting?"},
+      {s:"B", t:"That's a valid point. However, I believe the key is developing good digital habits."},
+      {s:"A", t:"What would you suggest to help students use social media more responsibly?"},
+      {s:"B", t:"I suggest schools teach digital literacy as a core subject. Students need to learn how to evaluate online information critically."}
     ],
     tasks: [
       {
-        label:"Latihan 1 — Ungkapkan Pendapat",
-        prompt:'Berikan pendapatmu tentang: "Should students wear uniforms to school?" Gunakan minimal 3 ungkapan pendapat yang berbeda.',
-        hint:'Gunakan: In my opinion... / I believe... / From my point of view... / I think...'
+        label:"Latihan 1 — State Your Opinion with Evidence",
+        prompt:'Give your opinion about this statement: "Social media does more harm than good for teenagers." Use expressions for stating opinions and support your view with at least 2 reasons.',
+        hint:"Use: In my opinion... / I believe... / From my perspective... / This is because... / Furthermore... / Therefore... Agree OR disagree — choose one position clearly."
       },
       {
-        label:"Latihan 2 — Berikan Saran",
-        prompt:'Temanmu sering terlambat ke sekolah. Berikan 3 saran yang berbeda untuk membantunya.',
-        hint:'Gunakan: You should... / I suggest... / Why don\'t you... / It would be better if...'
+        label:"Latihan 2 — Agree and Disagree",
+        prompt:'Practice agreeing and disagreeing. Respond to these statements: (1) "Online learning is as effective as face-to-face learning." (2) "Teenagers spend too much time on their phones." Give your opinion with reasons for each.',
+        hint:"Agree: I completely agree... / That is absolutely right... / I share that view because... Disagree: I respectfully disagree... / I see it differently... / While I understand your point, I think..."
       },
       {
-        label:"Latihan 3 — Setuju & Tidak Setuju",
-        prompt:'Tanggapi pernyataan ini: "Homework should be abolished." Berikan pendapat setuju ATAU tidak setuju dengan 2 alasan kuat.',
-        hint:'Mulai dengan: I agree/disagree with this statement because... Furthermore... Therefore...'
+        label:"Latihan 3 — Analytical Exposition Speech",
+        prompt:"Deliver a short analytical exposition (1-2 minutes) on ONE of these topics: (a) Why digital literacy is important for students, OR (b) Why students should limit their screen time. Include: thesis, 2 arguments with evidence, reiteration.",
+        hint:"Structure: THESIS (your position) → ARGUMENT 1 (reason + example) → ARGUMENT 2 (reason + example) → REITERATION (restate your position + call to action)"
       }
     ],
-    recPrompt: "Give your opinion about this topic: 'Social media has more negative effects than positive effects on teenagers.' State your position clearly and give at least two reasons to support your opinion.",
+    recPrompt: "Deliver an analytical exposition on this topic: 'Digital literacy is an essential skill for 21st century students.' State your thesis clearly, provide two strong arguments with evidence, and conclude with a reiteration of your position. Speak for 1-2 minutes.",
     scenarios: [
       {
-        tag:"Diskusi Kelas",
-        text:"Gurumu meminta pendapatmu: 'Do you think online learning is as effective as face-to-face learning?' Berikan pendapatmu dengan alasan yang kuat.",
-        hint:"Nyatakan posisi → berikan 2 alasan → berikan contoh → simpulkan",
-        answer:"In my opinion, online learning is not as effective as face-to-face learning. First, students tend to get distracted more easily at home. Second, it is harder to ask questions and interact with teachers online. Therefore, I believe face-to-face learning provides a better learning environment."
+        tag:"Diskusi Digital Safety",
+        text:"Temanmu baru saja menerima komentar kasar di media sosial dan merasa sangat sedih. Berikan pendapatmu tentang cyberbullying dan sarankan apa yang harus dilakukan.",
+        hint:"Gunakan: In my opinion, cyberbullying is... / I think you should... / I suggest... / It would be better if... / You have the right to...",
+        answer:"In my opinion, cyberbullying is a serious problem that should never be tolerated. I think you should first take screenshots of the comments as evidence. Then, I suggest you block and report the person who sent those messages. It would also be better if you talked to a trusted adult about what happened. Remember, you have the right to feel safe online. Most importantly, do not respond to the bully — that is exactly what they want."
       },
       {
-        tag:"Memberi Saran",
-        text:"Temanmu ingin meningkatkan kemampuan bahasa Inggrisnya tapi tidak tahu caranya. Berikan saran yang praktis dan motivasi untuknya.",
-        hint:"Gunakan: I suggest... / You could try... / It would help if... / Don't give up!",
-        answer:"I suggest you start by watching English movies with subtitles. You could also try speaking English with your friends every day, even just for a few minutes. It would also help if you kept a vocabulary notebook. Don't give up — practice makes perfect!"
+        tag:"Presentasi Opini",
+        text:"Gurumu memintamu mempresentasikan pendapatmu tentang: 'Should schools ban mobile phones in classrooms?' Berikan analytical exposition singkat dengan posisi yang jelas dan 2 argumen kuat.",
+        hint:"Mulai dengan thesis yang tegas → Argument 1 dengan contoh → Argument 2 dengan contoh → Reiteration yang kuat",
+        answer:"I firmly believe that schools should not completely ban mobile phones in classrooms. First, mobile phones can be powerful learning tools. Students can use them to access educational apps, look up information, and collaborate on projects. Second, banning phones does not teach students responsible use — it simply delays the problem. Instead, schools should teach students when and how to use their phones appropriately. Therefore, rather than a complete ban, schools should implement clear guidelines for responsible phone use in class."
       }
     ]
   },
   4: {
-    topic: "Narrative & Descriptive Speaking",
-    model: "Last weekend, I had an unforgettable experience. I visited Baturaden with my family. The weather was cool and refreshing. We hiked through the forest and saw a beautiful waterfall. It was truly an amazing day.",
+    topic: "Hortatory Exposition — Environment & Healthy Life",
+    model: "We should all take action to protect our environment. The evidence is clear: climate change is accelerating, biodiversity is declining, and pollution is affecting our health. Therefore, I urge every one of us to make conscious choices — reduce plastic use, save energy, and support environmental policies. The future of our planet depends on the actions we take today.",
     dialogue: [
-      {s:"A", t:"You look happy today! What happened?"},
-      {s:"B", t:"I just came back from a trip to Dieng Plateau. It was absolutely breathtaking!"},
-      {s:"A", t:"Really? Tell me more about it!"},
-      {s:"B", t:"The scenery was stunning. There were colorful lakes and ancient temples everywhere."},
-      {s:"A", t:"That sounds amazing! How was the weather?"},
-      {s:"B", t:"It was quite cold, around ten degrees Celsius. But the experience was worth it!"}
+      {s:"A", t:"Have you heard about the young environmental activist Aeshnina Azzahra?"},
+      {s:"B", t:"Yes! She wrote a letter to world leaders about plastic pollution when she was just 12 years old."},
+      {s:"A", t:"That's incredible. What do you think we can do to help the environment?"},
+      {s:"B", t:"I think we should start with small daily actions — reducing plastic, saving water, and choosing sustainable products."},
+      {s:"A", t:"Do you think individual actions are enough, or do we need bigger changes?"},
+      {s:"B", t:"Both are necessary. Individual actions create awareness, but we also need systemic changes in policy and industry."}
     ],
     tasks: [
       {
-        label:"Latihan 1 — Cerita Pengalaman",
-        prompt:'Ceritakan pengalaman liburan atau perjalanan yang paling berkesan bagimu. Gunakan past tense dengan benar.',
-        hint:'Mulai dengan: "Last... / A few months ago... / When I was..." Gunakan: went, saw, felt, enjoyed...'
+        label:"Latihan 1 — Hortatory Exposition: Environmental Action",
+        prompt:"Deliver a hortatory exposition urging your classmates to take action on ONE environmental issue: (a) reducing plastic waste, (b) saving water, or (c) reducing carbon footprint. Include: thesis, arguments, recommendation.",
+        hint:"Structure: THESIS (the problem + your recommendation) → ARGUMENT 1 (why it matters) → ARGUMENT 2 (what happens if we do nothing) → RECOMMENDATION (specific actions people should take)"
       },
       {
-        label:"Latihan 2 — Deskripsi Tempat",
-        prompt:'Deskripsikan tempat favoritmu (bisa rumah, sekolah, atau tempat wisata) sedetail mungkin.',
-        hint:'Gunakan kata sifat: beautiful, peaceful, crowded, modern, traditional... Jelaskan: lokasi, suasana, keunikan'
+        label:"Latihan 2 — Healthy Life Advocacy",
+        prompt:"Give a speech advocating for a healthier lifestyle for teenagers. Choose ONE topic: (a) the importance of exercise, (b) dangers of junk food, or (c) mental health awareness. Use persuasive language and give practical recommendations.",
+        hint:"Use: We must... / It is crucial that... / I urge you to... / Research shows that... / The consequences of... / Therefore, I recommend..."
       },
       {
-        label:"Latihan 3 — Cerita Fiksi Pendek",
-        prompt:'Ceritakan sebuah kisah pendek (2-3 menit) tentang seorang siswa yang menghadapi tantangan dan berhasil mengatasinya.',
-        hint:'Struktur: Setting (where/when) → Characters → Problem → Solution → Moral'
+        label:"Latihan 3 — Profile an Environmental Figure",
+        prompt:"Present a profile of an Indonesian environmental figure (e.g., Aeshnina Azzahra, Pak Sadiman, Melati & Isabel Wijsen, or Farwiza Farhan). Describe who they are, what they did, and why their work matters. Then urge your audience to follow their example.",
+        hint:"Structure: Who are they? → What did they do? → Why does it matter? → What can WE do? → Call to action"
       }
     ],
-    recPrompt: "Tell a story about the most memorable experience in your school life. It could be a competition, a school trip, a friendship, or any significant event. Use past tense and describe your feelings clearly.",
+    recPrompt: "Deliver a hortatory exposition urging your audience to take action on an environmental or health issue. State the problem clearly, give two strong arguments for why action is needed, and end with specific recommendations. Speak for 1-2 minutes.",
     scenarios: [
       {
-        tag:"Cerita Pengalaman",
-        text:"Temanmu dari luar kota ingin tahu tentang kota Purwokerto. Deskripsikan kota ini dengan menarik — tempat wisata, makanan khas, dan keunikannya.",
-        hint:"Gunakan: is located / is known for / you should visit / the most famous / locals usually",
-        answer:"Purwokerto is a city located in Central Java, Indonesia. It is known for its cool weather and beautiful natural scenery. The most famous tourist spot is Baturaden, a highland resort with waterfalls and hot springs. The local specialty food is mendoan, a soft fried tempeh that is absolutely delicious. If you visit, you should also try the local market in the morning."
+        tag:"Kampanye Lingkungan",
+        text:"Kamu diminta berpidato di depan sekolah tentang pentingnya mengurangi sampah plastik. Buat hortatory exposition yang meyakinkan dengan data/fakta dan rekomendasi yang spesifik.",
+        hint:"Mulai dengan fakta mengejutkan → Jelaskan dampak → Berikan 2-3 rekomendasi konkret → Tutup dengan call to action yang kuat",
+        answer:"Did you know that Indonesia is the second largest plastic polluter in the world? Every day, millions of plastic bags and bottles end up in our rivers and oceans, killing marine life and contaminating our water supply. This is a crisis we cannot ignore. I urge every one of you to take three simple actions: first, bring your own reusable bag when shopping; second, use a refillable water bottle instead of buying plastic ones; and third, join our school's weekly clean-up program. Together, we can make a difference. The ocean cannot wait — and neither can we."
       },
       {
-        tag:"Narasi Inspiratif",
-        text:"Ceritakan kisah seseorang yang menginspirasimu — bisa tokoh terkenal, guru, atau anggota keluarga. Jelaskan mengapa mereka menginspirasimu.",
-        hint:"Struktur: Siapa → Apa yang mereka lakukan → Mengapa menginspirasi → Apa yang kamu pelajari",
-        answer:"The person who inspires me the most is my mother. She worked very hard to support our family while also taking care of us. Despite all the challenges, she never gave up and always encouraged me to study hard. From her, I learned that determination and love can overcome any obstacle in life."
+        tag:"Healthy Life Presentation",
+        text:"Presentasikan tentang pentingnya gaya hidup sehat untuk remaja. Gunakan data/fakta dari penelitian dan berikan rekomendasi yang praktis.",
+        hint:"Gunakan: According to research... / Studies show that... / The consequences are... / I strongly recommend... / It is essential that teenagers...",
+        answer:"According to the World Health Organization, one in four teenagers worldwide does not get enough physical activity. This is alarming because regular exercise is essential for both physical and mental health. Studies show that teenagers who exercise regularly have better concentration, lower stress levels, and stronger immune systems. I strongly recommend that every student exercise for at least 30 minutes every day. It does not have to be intense — even a brisk walk or cycling to school counts. Your health is your greatest asset. Invest in it now."
       }
     ]
   },
   5: {
-    topic: "Analytical Exposition & Discussion",
-    model: "The use of technology in education has both advantages and disadvantages. On one hand, it makes learning more accessible and engaging. On the other hand, it can lead to distraction and over-dependence on devices. Therefore, a balanced approach is necessary.",
+    topic: "Narrative & Argumentative — Renewable Energy & E-Money",
+    model: "The transition to renewable energy is not just an environmental necessity — it is an economic opportunity. Countries that invest in solar, wind, and hydropower today will lead the global economy tomorrow. The story of Nayau and his village in Kalimantan proves that ordinary people, with determination and cooperation, can harness renewable energy and transform their communities.",
     dialogue: [
-      {s:"A", t:"I've been reading about climate change. It's quite alarming, isn't it?"},
-      {s:"B", t:"Absolutely. The evidence is overwhelming. Global temperatures are rising at an unprecedented rate."},
-      {s:"A", t:"What do you think we, as students, can do about it?"},
-      {s:"B", t:"Well, we can start with small actions — reducing plastic use, saving electricity, and raising awareness."},
-      {s:"A", t:"That's true. But don't you think the government should take stronger action?"},
-      {s:"B", t:"Certainly. Individual efforts are important, but systemic change requires policy intervention. Both are necessary."}
+      {s:"A", t:"I've been reading about the cashless society. Do you think e-money will completely replace cash?"},
+      {s:"B", t:"That's an interesting question. On one hand, e-money is more convenient and traceable. On the other hand, not everyone has access to digital banking."},
+      {s:"A", t:"What about security? Aren't digital transactions more vulnerable to fraud?"},
+      {s:"B", t:"There are risks, certainly. However, with proper security measures, digital transactions can actually be safer than carrying cash."},
+      {s:"A", t:"So what's your overall position on this?"},
+      {s:"B", t:"I believe a hybrid system is best — where both cash and e-money coexist, giving people the freedom to choose."}
     ],
     tasks: [
       {
-        label:"Latihan 1 — Analytical Exposition",
-        prompt:'Buat analytical exposition singkat tentang: "Why is English important for Indonesian students?" Sertakan thesis, arguments, dan reiteration.',
-        hint:'Struktur: Thesis (pernyataan posisi) → Argument 1 + evidence → Argument 2 + evidence → Reiteration (simpulan)'
+        label:"Latihan 1 — Retell a Narrative Text",
+        prompt:"Retell the story of Nayau from Gurung Mali village in West Kalimantan. He led his community to build a micro hydropower plant to bring electricity to their village. Include: the problem, the challenges, how they overcame them, and the outcome. Use past tense.",
+        hint:"Key events: No electricity → Nayau had an idea → Friends doubted him → They worked together → Built a micro hydropower plant → Village got electricity. Use: At first... / Despite... / However... / Finally... / As a result..."
       },
       {
-        label:"Latihan 2 — Discussion Text",
-        prompt:'Diskusikan dua sisi dari topik: "Should students be allowed to use AI tools for homework?" Berikan argumen pro dan kontra secara seimbang.',
-        hint:'Mulai dengan: "There are two sides to this issue..." Pro: ... Con: ... Conclusion: ...'
+        label:"Latihan 2 — Argumentative Text: E-Money",
+        prompt:'Give your argument on this topic: "A cashless society benefits everyone." Do you AGREE or DISAGREE? Provide your thesis, two arguments with evidence, and a conclusion. Use modal auxiliaries (should, must, can, will).',
+        hint:"Pro: convenience, security, financial inclusion, reduced crime. Con: digital divide, privacy concerns, system failures, exclusion of elderly/rural populations. Use: This can... / Society should... / It must be noted that... / While... / Nevertheless..."
       },
       {
-        label:"Latihan 3 — Pidato Persuasif",
-        prompt:'Buat pidato persuasif singkat (2-3 menit) untuk meyakinkan teman-temanmu agar lebih peduli terhadap lingkungan.',
-        hint:'Struktur: Hook (pembuka menarik) → Problem → Solution → Call to action → Closing'
+        label:"Latihan 3 — Discussion Text: Renewable Energy",
+        prompt:'Present a balanced discussion on: "Should Indonesia prioritize renewable energy over fossil fuels?" Present BOTH sides of the argument fairly, then give your own conclusion. Use contrastive conjunctions and passive voice.',
+        hint:"Structure: Issue → Arguments FOR renewable energy → Arguments AGAINST (challenges) → Your conclusion. Use: On one hand... / On the other hand... / It is argued that... / However... / In conclusion, it can be said that..."
       }
     ],
-    recPrompt: "Deliver a short speech (1-2 minutes) on this topic: 'The importance of learning English in the digital era.' Present your thesis clearly, support it with at least two strong arguments, and conclude with a memorable statement.",
+    recPrompt: "Deliver a speech on ONE of these topics: (a) 'The importance of renewable energy for Indonesia's future' OR (b) 'The advantages and disadvantages of a cashless society.' Present your thesis, support it with two strong arguments using evidence, and conclude with a clear recommendation. Speak for 1.5-2 minutes.",
     scenarios: [
       {
-        tag:"Debat Akademik",
-        text:"Dalam debat kelas, kamu mendapat posisi PRO untuk topik: 'Technology does more good than harm for students.' Sampaikan argumenmu dengan meyakinkan.",
-        hint:"Mulai dengan thesis yang kuat → 2-3 argumen dengan bukti → Antisipasi kontra argumen → Simpulan",
-        answer:"I firmly believe that technology does more good than harm for students. First, technology provides unlimited access to information and learning resources that were previously unavailable. Second, it develops digital literacy skills that are essential in today's job market. While there are risks like distraction, these can be managed with proper guidance. Therefore, the benefits of technology in education clearly outweigh its drawbacks."
+        tag:"Argumentasi E-Money",
+        text:"Dalam sebuah podcast sekolah, kamu diminta memberikan pendapat tentang: 'Cashless society: What do we gain and lose when cash is no longer king?' Berikan argumentative text yang seimbang dengan posisi akhir yang jelas.",
+        hint:"Struktur: Hook → Thesis → Argument 1 (gain) → Argument 2 (lose) → Rebuttal → Conclusion. Gunakan: modal auxiliaries, temporal connectives, abstract nouns",
+        answer:"Welcome to our school podcast. Today's topic is the cashless society. As digital payments become more common, we must ask: what do we gain and lose? On the positive side, e-money offers unmatched convenience — we can pay for anything with just a tap of our phone. It also reduces the risk of theft and makes financial transactions more transparent. However, we must not ignore the losses. Not everyone has access to smartphones or the internet, particularly in rural areas and among the elderly. Furthermore, digital systems can fail or be hacked. In conclusion, while a cashless society offers significant benefits, we should ensure that no one is left behind. A gradual, inclusive transition — where both cash and digital payments coexist — is the most responsible path forward."
       },
       {
-        tag:"Presentasi Akademik",
-        text:"Kamu diminta mempresentasikan hasil penelitian singkat tentang: 'The impact of social media on teenagers' mental health.' Sampaikan dengan struktur yang jelas.",
-        hint:"Struktur: Introduction → Findings/Arguments → Analysis → Conclusion → Recommendation",
-        answer:"Good morning, everyone. Today I will present my findings on the impact of social media on teenagers' mental health. Research shows that excessive social media use is linked to increased anxiety and depression among teenagers. However, when used mindfully, social media can also provide support networks and creative outlets. In conclusion, I recommend that teenagers limit their social media use to two hours per day and focus on meaningful interactions rather than passive scrolling."
+        tag:"Narasi Energi Terbarukan",
+        text:"Ceritakan kembali kisah Nayau dari Gurung Mali yang membangun pembangkit listrik tenaga air mikro untuk desanya. Kemudian hubungkan kisah ini dengan pentingnya energi terbarukan untuk Indonesia.",
+        hint:"Bagian 1 (narasi past tense): Ceritakan kisah Nayau. Bagian 2 (argumentasi present tense): Hubungkan dengan isu energi terbarukan Indonesia menggunakan modal auxiliaries.",
+        answer:"In a small village called Gurung Mali in West Kalimantan, there lived a man named Nayau who dared to dream of a brighter future. His village had no electricity, and the nights were long and dark. Despite facing doubt and financial challenges, Nayau gathered his community and together they built a micro hydropower plant. After three months of hard work, their village finally had light. This story is not just inspiring — it is a blueprint for Indonesia's energy future. Indonesia has enormous potential for renewable energy: rivers for hydropower, sun for solar energy, and wind for turbines. We must invest in these resources now, before our fossil fuels run out and our environment suffers further damage. The story of Nayau proves that with determination and cooperation, sustainable energy is possible for every community in Indonesia."
       }
     ]
   }
@@ -714,7 +731,43 @@ function renderLevels(levels, uploadedLevels = {}, feedbackMap = {}){
 }
 
 // ── Learning Panel ────────────────────────────────────────────────────────────
-function openLevel(levelId, levelNum, levelName, hasUploaded){
+async function openLevel(levelId, levelNum, levelName, hasUploaded){
+
+  // Jika sudah pernah upload rekaman, tampilkan konfirmasi
+  if(hasUploaded === 'yes'){
+    // Cek berapa kali sudah rekam
+    let attemptCount = 0;
+    try{
+      const r = await api.get('/recordings', { level_id: levelId, limit: 10 });
+      const mainRecs = r.data.recordings.filter(rec => rec.task_index === null || rec.task_index === undefined || rec.task_index === '');
+      attemptCount = mainRecs.length;
+    }catch(e){}
+
+    const remaining = 3 - attemptCount;
+    const attemptLabels = ['pertama','kedua','ketiga'];
+    const lastLabel = attemptLabels[attemptCount - 1] || `ke-${attemptCount}`;
+
+    if(remaining <= 0){
+      // Sudah 3x, tidak bisa rekam lagi
+      const lanjut = confirm(
+        `📋 Level ${levelNum} — ${levelName}\n\n` +
+        `Kamu sudah melakukan latihan sebanyak ${attemptCount}x (batas maksimal).\n\n` +
+        `Rekaman-rekaman sebelumnya masih tersimpan dan bisa dilihat.\n\n` +
+        `Apakah kamu ingin membuka panel untuk melihat materi dan riwayat rekaman?`
+      );
+      if(!lanjut) return;
+    } else {
+      const lanjut = confirm(
+        `📋 Level ${levelNum} — ${levelName}\n\n` +
+        `Kamu sudah pernah mengerjakan latihan ini (latihan ${lastLabel}).\n` +
+        `Sisa percobaan: ${remaining} kali lagi.\n\n` +
+        `✅ Rekaman latihan sebelumnya tetap tersimpan dan masih bisa dilihat dosen.\n\n` +
+        `Apakah kamu ingin mengulang latihan ini?`
+      );
+      if(!lanjut) return;
+    }
+  }
+
   currentLevelId    = levelId;
   currentLevelNum   = levelNum;
   scenarioIndex     = 0;
@@ -834,8 +887,24 @@ function speak(text, rate){
 }
 
 function playModel(){
+  const btn = document.getElementById('btn-play-model');
+  if(window.speechSynthesis && window.speechSynthesis.speaking){
+    window.speechSynthesis.cancel();
+    if(btn){ btn.textContent = '▶ Putar Audio'; btn.style.background = '#1a73e8'; }
+    return;
+  }
   const c = LEVEL_CONTENT[currentLevelNum];
-  if(c) speak(c.model);
+  if(!c) return;
+  const u = new SpeechSynthesisUtterance(c.model);
+  u.lang = 'en-US'; u.rate = speechRate;
+  u.onstart = () => {
+    if(btn){ btn.textContent = '⏹ Stop Audio'; btn.style.background = '#e53935'; }
+  };
+  u.onend = u.onerror = () => {
+    if(btn){ btn.textContent = '▶ Putar Audio'; btn.style.background = '#1a73e8'; }
+  };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
 }
 
 function playDialogue(){
@@ -866,6 +935,17 @@ function showRecAlert(msg, type='error'){
 }
 
 async function startRecording(){
+  // Jika sudah ada rekaman sebelumnya, minta konfirmasi
+  if(audioBlob || recordingUploaded){
+    const konfirmasi = confirm(
+      '⚠️ Kamu sudah memiliki rekaman sebelumnya.\n\n' +
+      'Apakah kamu ingin merekam ulang?\n\n' +
+      '• Rekaman lama yang sudah diupload tetap tersimpan dan bisa dilihat dosen.\n' +
+      '• Rekaman baru ini akan menjadi rekaman terbaru kamu.\n\n' +
+      'Lanjutkan rekam ulang?'
+    );
+    if(!konfirmasi) return;
+  }
   try{
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     audioChunks = [];
@@ -1057,24 +1137,32 @@ function speakSample(){
 }
 
 // Scenario recording
+let scBlob     = null;
+let scMimeType = '';
+
 async function startScenarioRec(){
   try{
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     scAudioChunks = [];
-    const mimeType = ['audio/webm;codecs=opus','audio/webm','video/webm;codecs=opus','video/webm','audio/ogg;codecs=opus','audio/ogg'].find(t=>MediaRecorder.isTypeSupported(t)) || '';
-    scMediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+    scMimeType = ['audio/webm;codecs=opus','audio/webm','video/webm;codecs=opus','video/webm','audio/ogg;codecs=opus','audio/ogg'].find(t=>MediaRecorder.isTypeSupported(t)) || '';
+    scMediaRecorder = new MediaRecorder(stream, scMimeType ? { mimeType: scMimeType } : {});
     scMediaRecorder.ondataavailable = e=>{ if(e.data.size>0) scAudioChunks.push(e.data); };
     scMediaRecorder.onstop = ()=>{
-      const blob = new Blob(scAudioChunks, { type: mimeType });
+      scBlob = new Blob(scAudioChunks, { type: scMimeType });
       const prev = document.getElementById('sc-preview');
-      prev.src = URL.createObjectURL(blob); prev.style.display='block';
+      prev.src = URL.createObjectURL(scBlob); prev.style.display='block';
       document.getElementById('sc-rec-status').textContent='✅ Rekaman skenario siap.';
+      const btnUp = document.getElementById('btn-sc-upload');
+      if(btnUp) btnUp.style.display='inline-block';
       stream.getTracks().forEach(t=>t.stop());
     };
     scMediaRecorder.start();
     scSeconds = 0;
+    scBlob = null;
     document.getElementById('btn-sc-start').style.display='none';
     document.getElementById('btn-sc-stop').style.display='inline-block';
+    const btnUp = document.getElementById('btn-sc-upload');
+    if(btnUp) btnUp.style.display='none';
     document.getElementById('sc-rec-status').textContent='🔴 Merekam...';
     scTimerInt = setInterval(()=>{
       scSeconds++;
@@ -1090,6 +1178,35 @@ function stopScenarioRec(){
   clearInterval(scTimerInt);
   document.getElementById('btn-sc-start').style.display='inline-block';
   document.getElementById('btn-sc-stop').style.display='none';
+}
+
+async function uploadScenarioRec(){
+  if(!scBlob){ alert('Tidak ada rekaman skenario.'); return; }
+  if(!currentLevelId){ alert('Level tidak diketahui.'); return; }
+  const btn = document.getElementById('btn-sc-upload');
+  btn.disabled = true; btn.textContent = '⏳ Mengupload...';
+  try{
+    const ext = scMimeType.includes('ogg') ? 'ogg' : scMimeType.includes('mp3') ? 'mp3' : 'webm';
+    const taskIdx = 10 + (scenarioIndex || 0); // skenario 1 = index 10, skenario 2 = index 11
+    const fd = new FormData();
+    fd.append('audio', scBlob, `scenario_${taskIdx}_${Date.now()}.${ext}`);
+    fd.append('level_id', currentLevelId);
+    fd.append('task_index', taskIdx);
+    await api.upload('/recordings', fd);
+    btn.textContent = '✅ Terupload';
+    document.getElementById('sc-rec-status').textContent = '✅ Rekaman skenario berhasil dikirim ke dosen!';
+    const alertEl = document.getElementById('scenario-rec-alert');
+    alertEl.className = 'alert success';
+    alertEl.textContent = 'Rekaman skenario berhasil diupload!';
+    alertEl.style.display = 'block';
+    setTimeout(()=>{ alertEl.style.display='none'; }, 4000);
+  }catch(e){
+    btn.disabled = false; btn.textContent = '⬆ Upload Skenario';
+    const alertEl = document.getElementById('scenario-rec-alert');
+    alertEl.className = 'alert error';
+    alertEl.textContent = 'Gagal upload: ' + (e.message || 'Error');
+    alertEl.style.display = 'block';
+  }
 }
 
 function finishLevel(){
@@ -1172,7 +1289,8 @@ async function loadRecordingHistory(levelId){
   if(!levelId) return;
   try{
     const r = await api.get('/recordings', { level_id: levelId, limit: 10 });
-    const recs = r.data.recordings;
+    // Filter hanya main recording (task_index null)
+    const recs = r.data.recordings.filter(rec => rec.task_index === null || rec.task_index === undefined || rec.task_index === '');
     const histDiv  = document.getElementById('recording-history');
     const histList = document.getElementById('recording-history-list');
     if(!histDiv || !histList) return;
@@ -1181,29 +1299,38 @@ async function loadRecordingHistory(levelId){
 
     histDiv.style.display = 'block';
     const attemptCount = recs.length;
-    const remaining    = 5 - attemptCount;
+    const remaining    = 3 - attemptCount;
+
+    const attemptLabels = ['Pertama', 'Kedua', 'Ketiga'];
 
     histList.innerHTML = `
       <div style="font-size:.8rem;color:#666;margin-bottom:.5rem">
-        Percobaan: <strong>${attemptCount}/5</strong>
-        ${remaining > 0 ? `— Sisa <strong>${remaining}</strong> kali` : ' — <span style="color:#e53935">Batas maksimal tercapai</span>'}
+        Percobaan: <strong>${attemptCount}/3</strong>
+        ${remaining > 0 ? `— Sisa <strong>${remaining}</strong> kali` : ' — <span style="color:#e53935;font-weight:700">Batas maksimal tercapai</span>'}
       </div>
-      ${recs.map((rec, i) => `
-        <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:.65rem;margin-bottom:.5rem">
+      ${recs.map((rec, i) => {
+        const attemptNum = rec.attempt_number || (attemptCount - i);
+        const label = attemptLabels[(attemptNum - 1)] || `ke-${attemptNum}`;
+        const isCurrent = rec.is_current == 1;
+        return `
+        <div style="background:${isCurrent ? '#e8f5e9' : '#f9f9f9'};border:1.5px solid ${isCurrent ? '#a5d6a7' : '#e0e0e0'};border-radius:8px;padding:.65rem;margin-bottom:.5rem">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem">
-            <span style="font-size:.8rem;font-weight:700;color:#1a73e8">Percobaan ${attemptCount - i}</span>
+            <span style="font-size:.8rem;font-weight:700;color:${isCurrent ? '#2e7d32' : '#1a73e8'}">
+              🎤 Latihan ${label} ${isCurrent ? '<span style="background:#43a047;color:#fff;border-radius:10px;padding:.1rem .4rem;font-size:.7rem;margin-left:.3rem">Terbaru</span>' : ''}
+            </span>
             <span style="font-size:.75rem;color:#999">${fmtDate(rec.uploaded_at)}</span>
           </div>
           <div id="hist-audio-${rec.id}" style="font-size:.78rem;color:#888">⏳ Memuat...</div>
-        </div>`).join('')}`;
+        </div>`;
+      }).join('')}`;
 
     // Load audio untuk setiap rekaman
     recs.forEach(rec => loadHistoryAudio(rec.id));
 
-    // Disable upload jika sudah 5 kali
+    // Disable upload jika sudah 3 kali
     if(remaining <= 0){
       const uploadBtn = document.getElementById('btn-upload');
-      if(uploadBtn){ uploadBtn.disabled=true; uploadBtn.textContent='Batas 5x tercapai'; uploadBtn.style.background='#999'; }
+      if(uploadBtn){ uploadBtn.disabled=true; uploadBtn.textContent='Batas 3x tercapai'; uploadBtn.style.background='#999'; }
       const startBtn = document.getElementById('btn-rec-start');
       if(startBtn){ startBtn.disabled=true; startBtn.style.opacity='.5'; }
     }

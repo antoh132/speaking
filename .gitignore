@@ -11,8 +11,17 @@ uploads/recordings/*.bin
 # Logs
 logs/*.log
 
-# Local config override (berisi credentials)
-# api/config/config.local.php
+# Local config override (berisi credentials — JANGAN commit)
+api/config/config.local.php
+
+# File gambar WhatsApp (tidak perlu di repo)
+WhatsApp*.jpeg
+WhatsApp*.jpg
+WhatsApp*.png
+
+# File database dump lokal
+speakon_db.sql
+speakon_db*.sql
 
 # Environment files
 .env

@@ -9,7 +9,8 @@
     body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#333}
     /* NAV */
     nav{background:#1a73e8;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-    nav .brand{font-size:1.3rem;font-weight:700}
+    nav .brand{display:flex;align-items:center}
+    nav .brand img{height:52px;width:auto;object-fit:contain}
     nav .nav-right{display:flex;align-items:center;gap:.75rem}
     nav .nav-right span{font-size:.9rem;opacity:.9}
     .btn{padding:.45rem .9rem;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:opacity .2s}
@@ -79,7 +80,9 @@
 
 <!-- NAV -->
 <nav>
-  <span class="brand">SpeakOn! <small style="font-size:.7rem;opacity:.8">Super Admin</small></span>
+  <span class="brand">
+    <img src="/speakon/frontend/images/logo-text.jpeg" alt="SpeakOn!" />
+  </span>
   <div class="nav-right">
     <span id="nav-username"></span>
     <button class="lang-btn active" id="btn-id" onclick="switchLang('id')">ID</button>

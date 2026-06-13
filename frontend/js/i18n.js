@@ -21,7 +21,10 @@ const i18n = (() => {
   /** @type {string} Base URL for i18n JSON files */
   const I18N_BASE = (() => {
     const path = window.location.pathname;
-    return path.startsWith('/speakon/') ? '/speakon/frontend/i18n/' : '/frontend/i18n/';
+    // Deteksi subfolder otomatis dari path (misal /speaking/, /speakon/, dll.)
+    const match = path.match(/^(\/[^/]+\/)/);
+    const subfolder = match ? match[1] : '/';
+    return subfolder + 'frontend/i18n/';
   })();
 
   /**

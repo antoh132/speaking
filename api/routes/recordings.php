@@ -153,18 +153,19 @@ elseif ($method === 'POST' && ($uri === '' || $uri === '/')) {
     $taskIndex = isset($_POST['task_index']) && $_POST['task_index'] !== '' ? (int)$_POST['task_index'] : null;
 
     try {
-        // Cek jumlah rekaman yang sudah ada untuk level ini (max 5, hanya hitung main recording)
+        // Cek jumlah rekaman yang sudah ada untuk level ini (max 3, hanya hitung main recording)
         $pdo = getDB();
         $countStmt = $pdo->prepare(
             'SELECT COUNT(*) AS cnt FROM recordings WHERE student_id = :sid AND level_id = :lid AND task_index IS NULL'
         );
         $countStmt->execute([':sid' => $currentUser->id, ':lid' => $levelId]);
         $count = (int)$countStmt->fetch()['cnt'];
-        if ($taskIndex === null && $count >= 5) {
-            Response::error(422, 'MAX_ATTEMPTS', 'Kamu sudah mencapai batas maksimal 5 kali rekaman untuk level ini.');
+        if ($taskIndex === null && $count >= 3) {
+            Response::error(422, 'MAX_ATTEMPTS', 'Kamu sudah mencapai batas maksimal 3 kali rekaman untuk level ini.');
         }
 
-        $recording = RecordingService::uploadRecording($currentUser->id, $levelId, $_FILES['audio'], $taskIndex);
+        $attemptNumber = ($taskIndex === null) ? $count + 1 : null;
+        $recording = RecordingService::uploadRecording($currentUser->id, $levelId, $_FILES['audio'], $taskIndex, $attemptNumber);
 
         AuditService::writeLog(
             $currentUser->id,

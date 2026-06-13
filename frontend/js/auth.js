@@ -12,8 +12,12 @@
 const auth = (() => {
   const USER_KEY = 'speakon_user';
 
-  // Deteksi base path otomatis
-  const BASE = window.location.pathname.startsWith('/speakon/') ? '/speakon' : '';
+  // Deteksi base path otomatis dari subfolder
+  const BASE = (() => {
+    const path = window.location.pathname;
+    const match = path.match(/^(\/[^/]+\/)/);
+    return match ? match[1].replace(/\/$/, '') : '';
+  })();
 
   // ── Login ────────────────────────────────────────────────────────────────────
 

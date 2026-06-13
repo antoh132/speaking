@@ -158,6 +158,82 @@ elseif ($method === 'POST' && $uri === '/refresh') {
     }
 }
 
+// ── POST /api/auth/register ───────────────────────────────────────────────────
+elseif ($method === 'POST' && $uri === '/register') {
+    try {
+        $body = Validator::parseJsonBody();
+
+        $fullName = Validator::required(Validator::get($body, 'full_name'), 'full_name');
+        $fullName = Validator::minLength($fullName, 2, 'full_name');
+        $fullName = Validator::maxLength($fullName, 100, 'full_name');
+
+        $email    = Validator::email(Validator::get($body, 'email'));
+        $password = Validator::password(Validator::get($body, 'password'), 8, 'password');
+
+        // Konfirmasi password
+        $confirmPassword = Validator::required(Validator::get($body, 'confirm_password'), 'confirm_password');
+        if ($password !== $confirmPassword) {
+            throw new InvalidArgumentException('Konfirmasi password tidak cocok.');
+        }
+
+        $pdo = getDB();
+
+        // Cek email sudah terdaftar
+        $check = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+        $check->execute([':email' => $email]);
+        if ($check->fetch()) {
+            Response::conflict('EMAIL_ALREADY_EXISTS', 'Email sudah terdaftar. Gunakan email lain.');
+        }
+
+        // Buat akun siswa
+        $userId       = generateUUID();
+        $passwordHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => BCRYPT_COST]);
+
+        $stmt = $pdo->prepare(
+            'INSERT INTO users (id, full_name, email, password_hash, role, is_active, language_pref, created_at, updated_at, created_by)
+             VALUES (:id, :full_name, :email, :password_hash, :role, 1, :lang, NOW(), NOW(), NULL)'
+        );
+        $stmt->execute([
+            ':id'            => $userId,
+            ':full_name'     => trim($fullName),
+            ':email'         => $email,
+            ':password_hash' => $passwordHash,
+            ':role'          => 'siswa',
+            ':lang'          => 'id',
+        ]);
+
+        // Inisialisasi level progress
+        require_once __DIR__ . '/../services/LevelService.php';
+        LevelService::initializeStudentLevels($userId);
+
+        // Audit log
+        AuditService::writeLog(
+            $userId,
+            'siswa',
+            AuditService::ACTION_USER_CREATED,
+            AuditService::ENTITY_USER,
+            $userId,
+            ['email' => $email, 'role' => 'siswa', 'self_registered' => true],
+            AuditService::getClientIp()
+        );
+
+        Response::success([
+            'message' => 'Akun berhasil dibuat. Silakan login.',
+            'user'    => [
+                'id'       => $userId,
+                'fullName' => trim($fullName),
+                'email'    => $email,
+                'role'     => 'siswa',
+            ],
+        ], 201);
+
+    } catch (InvalidArgumentException $e) {
+        Response::validationError($e->getMessage());
+    } catch (RuntimeException $e) {
+        Response::serverError('Gagal membuat akun. Silakan coba lagi.');
+    }
+}
+
 // ── 404 fallback ──────────────────────────────────────────────────────────────
 else {
     Response::notFound('Endpoint tidak ditemukan.');
@@ -175,7 +251,9 @@ function getRedirectPath(string $role): string
 {
     // Deteksi apakah berjalan di subfolder /speakon/ atau di root
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-    $base = str_starts_with($requestUri, '/speakon/') ? '/speakon' : '';
+    // Deteksi subfolder otomatis (misal /speaking/ atau /speakon/)
+    preg_match('#^(/[^/]+)/#', $requestUri, $m);
+    $base = isset($m[1]) && $m[1] !== '/api' ? $m[1] : '';
 
     return match ($role) {
         'superadmin' => $base . '/dashboard-superadmin.html',

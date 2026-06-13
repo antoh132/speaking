@@ -8,7 +8,8 @@
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#333}
     nav{background:#1a73e8;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-    nav .brand{font-size:1.3rem;font-weight:700}
+    nav .brand{display:flex;align-items:center}
+    nav .brand img{height:52px;width:auto;object-fit:contain}
     nav .nav-right{display:flex;align-items:center;gap:.75rem}
     .btn{padding:.45rem .9rem;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:opacity .2s}
     .btn:hover{opacity:.85}
@@ -68,7 +69,9 @@
 <body>
 
 <nav>
-  <span class="brand">SpeakOn! <small style="font-size:.7rem;opacity:.8">Dosen</small></span>
+  <span class="brand">
+    <img src="/speakon/frontend/images/logo-text.jpeg" alt="SpeakOn!" />
+  </span>
   <div class="nav-right">
     <span id="nav-username" style="font-size:.9rem;opacity:.9"></span>
     <button class="lang-btn active" id="btn-id" onclick="switchLang('id')">ID</button>
@@ -92,7 +95,6 @@
       </select>
       <select id="filter-status" onchange="loadRecordings()">
         <option value="pending">Belum Dinilai</option>
-        <option value="current">Rekaman Terbaru</option>
         <option value="all">Semua Rekaman</option>
       </select>
     </div>
@@ -123,132 +125,131 @@ function fmtDate(d){ return d ? new Date(d).toLocaleString('id-ID') : '—'; }
 function fmtSize(b){ return b ? (b/1024/1024).toFixed(2)+' MB' : '—'; }
 
 const LEVEL_TOPICS = {
-  1: 'Greeting & Self-Introduction',
-  2: 'Asking & Giving Information',
-  3: 'Expressing Opinions & Suggestions',
-  4: 'Narrative & Descriptive Speaking',
-  5: 'Analytical Exposition & Discussion'
+  1: 'Descriptive Text — Great Athletes',
+  2: 'Recount Text — Sports Events',
+  3: 'Analytical Exposition — Digital Literacies',
+  4: 'Hortatory Exposition — Environment & Healthy Life',
+  5: 'Narrative & Argumentative — Renewable Energy & E-Money'
 };
 
 // Konten per level per step untuk konteks dosen
-// Konten per level per step untuk konteks dosen
 const LEVEL_CONTENT = {
   1: {
-    topic: 'Greeting & Self-Introduction',
-    model: 'Good morning! My name is Andi Pratama. I am a student at SMA Muhammadiyah. I am sixteen years old and I live in Purwokerto. Nice to meet you!',
+    topic: 'Descriptive Text — Great Athletes',
+    model: 'Anthony Sinisuka Ginting is one of Indonesia\'s greatest badminton players. He has a strong and athletic build, standing about 178 centimeters tall. He is known for his incredible speed, powerful smashes, and great determination on the court.',
     tasks: [
-      { label:'Latihan 1 — Sapa dan Perkenalkan Diri', prompt:'Ucapkan salam dan perkenalkan dirimu: nama, kelas, asal, dan satu hal tentang dirimu.' },
-      { label:'Latihan 2 — Tanya Jawab Perkenalan', prompt:'Bayangkan kamu bertemu teman baru. Ucapkan: (1) salam, (2) perkenalan diri, (3) tanya nama teman, (4) ungkapkan senang berkenalan.' },
-      { label:'Latihan 3 — Perkenalan Formal', prompt:'Perkenalkan dirimu secara formal seolah kamu sedang presentasi di depan kelas (minimal 5 kalimat).' }
+      { label:'Latihan 1 — Describe an Athlete\'s Appearance', prompt:'Describe the physical appearance of your favorite athlete. Include: height, build, skin color, hair, and any distinctive features. Use adjectives and adverbs.' },
+      { label:'Latihan 2 — Describe an Athlete\'s Qualities', prompt:'Describe the personality and qualities that make your favorite athlete great. Give at least 3 qualities with examples or evidence.' },
+      { label:'Latihan 3 — Full Descriptive Monologue', prompt:'Give a complete description of a great Indonesian athlete (e.g., Greysia Polii, Leani Ratri Oktila, or Boaz Solossa). Include: who they are, appearance, achievements, and why they inspire you.' }
     ],
-    recPrompt: 'Introduce yourself formally in front of the class. Include your name, age, school, hobbies, and your dream for the future. Speak for at least 30 seconds.',
+    recPrompt: 'Describe your favorite athlete in detail. Talk about their appearance, personality, achievements, and what makes them a great athlete. Use descriptive adjectives and adverbs. Speak for at least 45 seconds.',
     scenarios: [
-      { tag:'Perkenalan Baru', text:'Kamu adalah siswa baru di sekolah. Guru memintamu memperkenalkan diri di depan kelas. Apa yang kamu katakan?' },
-      { tag:'Bertemu Tamu', text:'Ada tamu dari sekolah lain yang berkunjung. Kamu diminta menyambut dan memperkenalkan diri sebagai perwakilan kelas.' }
+      { tag:'Guess Who Game', text:'Describe a famous athlete without saying their name. Include their sport, nationality, physical appearance, and 2 key achievements.' },
+      { tag:'Inspiring Athlete Story', text:'Tell the story of Leani Ratri Oktila, a Paralympic badminton champion from Indonesia. She had an accident at age 20 but came back to win gold at Tokyo 2020.' }
     ]
   },
   2: {
-    topic: 'Asking & Giving Information',
-    model: 'Excuse me, could you tell me how to get to the library? Sure! Go straight ahead, then turn left at the second corridor. The library is on your right.',
+    topic: 'Recount Text — Sports Events',
+    model: 'Last Saturday, I had an amazing experience watching a live badminton tournament at the sports hall. The atmosphere was electric. Thousands of fans were cheering loudly. I could see, hear, smell, and feel the excitement all around me.',
     tasks: [
-      { label:'Latihan 1 — Meminta Informasi', prompt:'Ucapkan 3 cara berbeda untuk meminta informasi tentang jadwal pelajaran.' },
-      { label:'Latihan 2 — Memberi Petunjuk Arah', prompt:'Jelaskan arah dari gerbang sekolah ke ruang kepala sekolah dengan jelas.' },
-      { label:'Latihan 3 — Tanya Jawab Informasi', prompt:'Bayangkan kamu adalah petugas informasi sekolah. Jawab pertanyaan: "What time does the school start? Where is the canteen? When is the English class?"' }
+      { label:'Latihan 1 — Describe a Sports Event Using 5 Senses', prompt:'Describe a sports event you have watched using all 5 senses: what you SAW, HEARD, SMELLED, TASTED, and FELT. Use past tense.' },
+      { label:'Latihan 2 — Recount a Sports Experience', prompt:'Recount your personal experience of watching or participating in a sports event. Include: when and where it happened, what you did, what happened, and how you felt.' },
+      { label:'Latihan 3 — Compare Two Sports Events', prompt:'Compare two sports events you have experienced or know about. Describe the differences in atmosphere, excitement, and your personal feelings about each one.' }
     ],
-    recPrompt: 'You are a new student asking for information. Ask about: (1) where the library is, (2) what time it opens, and (3) how to borrow a book. Speak naturally as if talking to a real person.',
+    recPrompt: 'Recount your most exciting experience watching or participating in a sports event. Use the 5 senses to describe the atmosphere. Include what happened, how you felt, and why it was memorable. Use past tense throughout.',
     scenarios: [
-      { tag:'Tamu Sekolah', text:'Seorang tamu asing datang ke sekolahmu dan bertanya: "Excuse me, where can I find the principal\'s office?" Bantu dia dengan petunjuk yang jelas.' },
-      { tag:'Informasi Kegiatan', text:'Temanmu dari sekolah lain bertanya tentang kegiatan ekstrakurikuler di sekolahmu. Jelaskan minimal 3 kegiatan yang ada.' }
+      { tag:'Cerita Pengalaman Olahraga', text:'Kamu baru saja menonton pertandingan olahraga yang sangat seru. Ceritakan pengalamanmu kepada temanmu menggunakan 5 indera dan past tense.' },
+      { tag:'Paralympic Games Story', text:'Ceritakan tentang Paralympic Games — apa itu, mengapa penting, dan bagaimana atlet Paralympic menginspirasi kamu.' }
     ]
   },
   3: {
-    topic: 'Expressing Opinions & Suggestions',
-    model: 'In my opinion, students should limit their screen time because spending too much time on social media can affect their concentration and sleep quality.',
+    topic: 'Analytical Exposition — Digital Literacies & Opinions',
+    model: 'In my opinion, digital literacy is one of the most important skills for young people today. First, it helps us access and evaluate information critically. Second, it enables us to communicate effectively in digital spaces. Therefore, schools should prioritize teaching digital literacy.',
     tasks: [
-      { label:'Latihan 1 — Ungkapkan Pendapat', prompt:'Berikan pendapatmu tentang: "Should students wear uniforms to school?" Gunakan minimal 3 ungkapan pendapat yang berbeda.' },
-      { label:'Latihan 2 — Berikan Saran', prompt:'Temanmu sering terlambat ke sekolah. Berikan 3 saran yang berbeda untuk membantunya.' },
-      { label:'Latihan 3 — Setuju & Tidak Setuju', prompt:'Tanggapi pernyataan ini: "Homework should be abolished." Berikan pendapat setuju ATAU tidak setuju dengan 2 alasan kuat.' }
+      { label:'Latihan 1 — State Your Opinion with Evidence', prompt:'Give your opinion about: "Social media does more harm than good for teenagers." Use expressions for stating opinions and support your view with at least 2 reasons.' },
+      { label:'Latihan 2 — Agree and Disagree', prompt:'Respond to: (1) "Online learning is as effective as face-to-face learning." (2) "Teenagers spend too much time on their phones." Give your opinion with reasons for each.' },
+      { label:'Latihan 3 — Analytical Exposition Speech', prompt:'Deliver a short analytical exposition (1-2 minutes) on: (a) Why digital literacy is important for students, OR (b) Why students should limit their screen time. Include: thesis, 2 arguments, reiteration.' }
     ],
-    recPrompt: 'Give your opinion about this topic: "Social media has more negative effects than positive effects on teenagers." State your position clearly and give at least two reasons to support your opinion.',
+    recPrompt: 'Deliver an analytical exposition on: "Digital literacy is an essential skill for 21st century students." State your thesis clearly, provide two strong arguments with evidence, and conclude with a reiteration. Speak for 1-2 minutes.',
     scenarios: [
-      { tag:'Diskusi Kelas', text:'Gurumu meminta pendapatmu: "Do you think online learning is as effective as face-to-face learning?" Berikan pendapatmu dengan alasan yang kuat.' },
-      { tag:'Memberi Saran', text:'Temanmu ingin meningkatkan kemampuan bahasa Inggrisnya tapi tidak tahu caranya. Berikan saran yang praktis dan motivasi untuknya.' }
+      { tag:'Diskusi Digital Safety', text:'Temanmu baru saja menerima komentar kasar di media sosial. Berikan pendapatmu tentang cyberbullying dan sarankan apa yang harus dilakukan.' },
+      { tag:'Presentasi Opini', text:'Presentasikan pendapatmu tentang: "Should schools ban mobile phones in classrooms?" Berikan analytical exposition dengan posisi jelas dan 2 argumen kuat.' }
     ]
   },
   4: {
-    topic: 'Narrative & Descriptive Speaking',
-    model: 'Last weekend, I had an unforgettable experience. I visited Baturaden with my family. The weather was cool and refreshing. We hiked through the forest and saw a beautiful waterfall. It was truly an amazing day.',
+    topic: 'Hortatory Exposition — Environment & Healthy Life',
+    model: 'We should all take action to protect our environment. The evidence is clear: climate change is accelerating, biodiversity is declining, and pollution is affecting our health. Therefore, I urge every one of us to make conscious choices — reduce plastic use, save energy, and support environmental policies.',
     tasks: [
-      { label:'Latihan 1 — Cerita Pengalaman', prompt:'Ceritakan pengalaman liburan atau perjalanan yang paling berkesan bagimu. Gunakan past tense dengan benar.' },
-      { label:'Latihan 2 — Deskripsi Tempat', prompt:'Deskripsikan tempat favoritmu (bisa rumah, sekolah, atau tempat wisata) sedetail mungkin.' },
-      { label:'Latihan 3 — Cerita Fiksi Pendek', prompt:'Ceritakan sebuah kisah pendek (2-3 menit) tentang seorang siswa yang menghadapi tantangan dan berhasil mengatasinya.' }
+      { label:'Latihan 1 — Hortatory Exposition: Environmental Action', prompt:'Deliver a hortatory exposition urging classmates to take action on ONE environmental issue: (a) reducing plastic waste, (b) saving water, or (c) reducing carbon footprint. Include: thesis, arguments, recommendation.' },
+      { label:'Latihan 2 — Healthy Life Advocacy', prompt:'Give a speech advocating for a healthier lifestyle for teenagers. Choose ONE topic: (a) importance of exercise, (b) dangers of junk food, or (c) mental health awareness. Use persuasive language.' },
+      { label:'Latihan 3 — Profile an Environmental Figure', prompt:'Present a profile of an Indonesian environmental figure (e.g., Aeshnina Azzahra, Pak Sadiman, Melati & Isabel Wijsen, or Farwiza Farhan). Describe who they are, what they did, and urge the audience to follow their example.' }
     ],
-    recPrompt: 'Tell a story about the most memorable experience in your school life. It could be a competition, a school trip, a friendship, or any significant event. Use past tense and describe your feelings clearly.',
+    recPrompt: 'Deliver a hortatory exposition urging your audience to take action on an environmental or health issue. State the problem clearly, give two strong arguments, and end with specific recommendations. Speak for 1-2 minutes.',
     scenarios: [
-      { tag:'Cerita Pengalaman', text:'Temanmu dari luar kota ingin tahu tentang kota Purwokerto. Deskripsikan kota ini dengan menarik — tempat wisata, makanan khas, dan keunikannya.' },
-      { tag:'Narasi Inspiratif', text:'Ceritakan kisah seseorang yang menginspirasimu — bisa tokoh terkenal, guru, atau anggota keluarga. Jelaskan mengapa mereka menginspirasimu.' }
+      { tag:'Kampanye Lingkungan', text:'Berpidato di depan sekolah tentang pentingnya mengurangi sampah plastik. Buat hortatory exposition dengan data/fakta dan rekomendasi spesifik.' },
+      { tag:'Healthy Life Presentation', text:'Presentasikan tentang pentingnya gaya hidup sehat untuk remaja. Gunakan data/fakta dari penelitian dan berikan rekomendasi yang praktis.' }
     ]
   },
   5: {
-    topic: 'Analytical Exposition & Discussion',
-    model: 'The use of technology in education has both advantages and disadvantages. On one hand, it makes learning more accessible and engaging. On the other hand, it can lead to distraction and over-dependence on devices. Therefore, a balanced approach is necessary.',
+    topic: 'Narrative & Argumentative — Renewable Energy & E-Money',
+    model: 'The transition to renewable energy is not just an environmental necessity — it is an economic opportunity. The story of Nayau and his village in Kalimantan proves that ordinary people, with determination and cooperation, can harness renewable energy and transform their communities.',
     tasks: [
-      { label:'Latihan 1 — Analytical Exposition', prompt:'Buat analytical exposition singkat tentang: "Why is English important for Indonesian students?" Sertakan thesis, arguments, dan reiteration.' },
-      { label:'Latihan 2 — Discussion Text', prompt:'Diskusikan dua sisi dari topik: "Should students be allowed to use AI tools for homework?" Berikan argumen pro dan kontra secara seimbang.' },
-      { label:'Latihan 3 — Pidato Persuasif', prompt:'Buat pidato persuasif singkat (2-3 menit) untuk meyakinkan teman-temanmu agar lebih peduli terhadap lingkungan.' }
+      { label:'Latihan 1 — Retell a Narrative Text', prompt:'Retell the story of Nayau from Gurung Mali village in West Kalimantan who built a micro hydropower plant. Include: the problem, challenges, how they overcame them, and the outcome. Use past tense.' },
+      { label:'Latihan 2 — Argumentative Text: E-Money', prompt:'Give your argument on: "A cashless society benefits everyone." AGREE or DISAGREE? Provide thesis, two arguments with evidence, and conclusion. Use modal auxiliaries (should, must, can, will).' },
+      { label:'Latihan 3 — Discussion Text: Renewable Energy', prompt:'Present a balanced discussion on: "Should Indonesia prioritize renewable energy over fossil fuels?" Present BOTH sides fairly, then give your conclusion. Use contrastive conjunctions and passive voice.' }
     ],
-    recPrompt: 'Deliver a short speech (1-2 minutes) on this topic: "The importance of learning English in the digital era." Present your thesis clearly, support it with at least two strong arguments, and conclude with a memorable statement.',
+    recPrompt: 'Deliver a speech on: (a) "The importance of renewable energy for Indonesia\'s future" OR (b) "The advantages and disadvantages of a cashless society." Present thesis + 2 arguments + recommendation. Speak for 1.5-2 minutes.',
     scenarios: [
-      { tag:'Debat Akademik', text:'Dalam debat kelas, kamu mendapat posisi PRO untuk topik: "Technology does more good than harm for students." Sampaikan argumenmu dengan meyakinkan.' },
-      { tag:'Presentasi Akademik', text:'Kamu diminta mempresentasikan hasil penelitian singkat tentang: "The impact of social media on teenagers\' mental health." Sampaikan dengan struktur yang jelas.' }
+      { tag:'Argumentasi E-Money', text:'Dalam podcast sekolah, berikan pendapat tentang: "Cashless society: What do we gain and lose when cash is no longer king?" Berikan argumentative text yang seimbang dengan posisi akhir yang jelas.' },
+      { tag:'Narasi Energi Terbarukan', text:'Ceritakan kisah Nayau dari Gurung Mali yang membangun pembangkit listrik tenaga air mikro. Kemudian hubungkan dengan pentingnya energi terbarukan untuk Indonesia.' }
     ]
   }
 };
 
 const LEVEL_STEPS = {
   1: {
-    topic: 'Greeting & Self-Introduction',
+    topic: 'Descriptive Text — Great Athletes',
     steps: [
-      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "Good morning! My name is Andi Pratama..."', criteria:'Apakah siswa memahami model pengucapan dan intonasi?' },
-      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: sapa diri, tanya jawab, perkenalan formal', criteria:'Apakah siswa mampu mengucapkan salam dan memperkenalkan diri dengan benar?' },
-      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Introduce yourself formally (name, age, school, hobbies, dream)', criteria:'Apakah pengucapan, intonasi, dan kelancaran sudah baik?' },
-      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Siswa baru memperkenalkan diri di kelas / menyambut tamu', criteria:'Apakah siswa mampu berkomunikasi dalam situasi nyata?' }
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: Deskripsi atlet Anthony Sinisuka Ginting — penampilan fisik, kualitas, dan prestasi', criteria:'Apakah siswa memahami struktur descriptive text dan penggunaan adjectives/adverbs?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'Latihan 1: Describe appearance | Latihan 2: Describe qualities | Latihan 3: Full descriptive monologue tentang atlet Indonesia', criteria:'Apakah siswa menggunakan adjectives, adverbs, dan present simple dengan tepat untuk mendeskripsikan?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Describe your favorite athlete — appearance, personality, achievements, and why they are great (min. 45 detik)', criteria:'Apakah deskripsi lengkap (identification + description)? Apakah adjectives dan adverbs digunakan dengan benar? Apakah pengucapan jelas?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario 1: Guess Who Game (deskripsikan atlet tanpa menyebut nama) | Skenario 2: Cerita inspiratif Leani Ratri Oktila (Paralympic champion)', criteria:'Apakah siswa mampu mendeskripsikan secara detail dan komunikatif? Apakah struktur identification → description terpenuhi?' }
     ]
   },
   2: {
-    topic: 'Asking & Giving Information',
+    topic: 'Recount Text — Sports Events',
     steps: [
-      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "Excuse me, could you tell me how to get to the library?"', criteria:'Apakah siswa memahami cara meminta dan memberi informasi?' },
-      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: meminta informasi, petunjuk arah, tanya jawab', criteria:'Apakah siswa mampu menggunakan ekspresi meminta/memberi informasi?' },
-      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Ask about library location, opening time, and borrowing procedure', criteria:'Apakah pertanyaan disampaikan dengan jelas dan natural?' },
-      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Membantu tamu / menjelaskan kegiatan ekstrakurikuler', criteria:'Apakah siswa mampu memberi informasi dalam konteks nyata?' }
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: Recount menonton turnamen bulu tangkis menggunakan 5 indera — past tense', criteria:'Apakah siswa memahami struktur recount text dan penggunaan past tense?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'Latihan 1: Describe sports event using 5 senses | Latihan 2: Recount personal sports experience | Latihan 3: Compare two sports events', criteria:'Apakah siswa menggunakan past tense dengan benar? Apakah time connectives (first, then, finally) digunakan?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Recount most exciting sports experience using 5 senses — past tense throughout', criteria:'Apakah struktur recount terpenuhi (orientation, events, reorientation)? Apakah 5 indera digunakan? Apakah past tense konsisten?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario 1: Cerita pengalaman menonton pertandingan olahraga | Skenario 2: Cerita tentang Paralympic Games dan atlet inspiratif', criteria:'Apakah siswa mampu menceritakan pengalaman dengan runtut dan ekspresif? Apakah past tense dan time connectives digunakan dengan benar?' }
     ]
   },
   3: {
-    topic: 'Expressing Opinions & Suggestions',
+    topic: 'Analytical Exposition — Digital Literacies & Opinions',
     steps: [
-      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "In my opinion, students should limit their screen time..."', criteria:'Apakah siswa memahami cara mengungkapkan pendapat?' },
-      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: ungkapkan pendapat, berikan saran, setuju/tidak setuju', criteria:'Apakah siswa menggunakan ekspresi pendapat dengan tepat?' },
-      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Give opinion about social media effects on teenagers', criteria:'Apakah pendapat disampaikan dengan argumen yang jelas?' },
-      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Diskusi kelas / memberi saran kepada teman', criteria:'Apakah siswa mampu berdiskusi dan memberi saran secara natural?' }
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: Analytical exposition tentang pentingnya digital literacy — thesis, arguments, reiteration', criteria:'Apakah siswa memahami struktur analytical exposition dan ekspresi menyatakan pendapat?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'Latihan 1: State opinion about social media | Latihan 2: Agree and disagree | Latihan 3: Full analytical exposition speech (1-2 menit)', criteria:'Apakah siswa menggunakan ekspresi pendapat (In my opinion, I believe, I agree/disagree) dengan tepat? Apakah argumen didukung bukti?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Analytical exposition — Digital literacy is essential for 21st century students (1-2 menit)', criteria:'Apakah struktur terpenuhi (thesis → arguments → reiteration)? Apakah argumen logis dan didukung contoh? Apakah ekspresi pendapat bervariasi?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario 1: Diskusi cyberbullying dan digital safety | Skenario 2: Presentasi opini tentang mobile phones di kelas', criteria:'Apakah siswa mampu menyatakan dan mempertahankan pendapat dengan percaya diri? Apakah ekspresi agree/disagree digunakan dengan tepat?' }
     ]
   },
   4: {
-    topic: 'Narrative & Descriptive Speaking',
+    topic: 'Hortatory Exposition — Environment & Healthy Life',
     steps: [
-      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "Last weekend, I had an unforgettable experience..."', criteria:'Apakah siswa memahami struktur narasi dan deskripsi?' },
-      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: cerita pengalaman, deskripsi tempat, cerita fiksi', criteria:'Apakah siswa menggunakan past tense dan kata deskriptif dengan benar?' },
-      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Tell the most memorable experience in school life', criteria:'Apakah cerita disampaikan dengan runtut dan ekspresif?' },
-      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Mendeskripsikan kota / menceritakan tokoh inspiratif', criteria:'Apakah deskripsi/narasi disampaikan dengan detail dan menarik?' }
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: Hortatory exposition tentang perlindungan lingkungan — thesis, arguments, recommendation', criteria:'Apakah siswa memahami perbedaan hortatory exposition (recommendation) vs analytical exposition (reiteration)?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'Latihan 1: Hortatory exposition tentang isu lingkungan | Latihan 2: Healthy life advocacy speech | Latihan 3: Profile tokoh lingkungan Indonesia', criteria:'Apakah siswa menggunakan bahasa persuasif (We must, I urge, It is crucial)? Apakah rekomendasi spesifik dan actionable?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Hortatory exposition tentang isu lingkungan atau kesehatan dengan rekomendasi konkret (1-2 menit)', criteria:'Apakah struktur terpenuhi (thesis → arguments → recommendation)? Apakah bahasa persuasif digunakan? Apakah rekomendasi jelas dan praktis?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario 1: Pidato kampanye lingkungan tentang sampah plastik | Skenario 2: Presentasi gaya hidup sehat untuk remaja', criteria:'Apakah siswa mampu meyakinkan audiens? Apakah data/fakta digunakan sebagai pendukung? Apakah call to action kuat dan jelas?' }
     ]
   },
   5: {
-    topic: 'Analytical Exposition & Discussion',
+    topic: 'Narrative & Argumentative — Renewable Energy & E-Money',
     steps: [
-      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: "The use of technology in education has both advantages and disadvantages..."', criteria:'Apakah siswa memahami struktur analytical exposition?' },
-      { num:2, label:'Latihan', icon:'✍️', desc:'3 latihan: analytical exposition, discussion text, pidato persuasif', criteria:'Apakah siswa mampu menyusun argumen yang logis?' },
-      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Speech about importance of English in digital era', criteria:'Apakah pidato disampaikan dengan struktur yang jelas dan meyakinkan?' },
-      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario: Debat akademik / presentasi hasil penelitian', criteria:'Apakah siswa mampu berargumen dan berpresentasi secara akademik?' }
+      { num:1, label:'Dengarkan', icon:'🔊', desc:'Audio model: Argumentative text tentang transisi energi terbarukan — thesis, arguments, conclusion', criteria:'Apakah siswa memahami struktur narrative text (past tense) dan argumentative text (modal auxiliaries, contrastive conjunctions)?' },
+      { num:2, label:'Latihan', icon:'✍️', desc:'Latihan 1: Retell kisah Nayau (narrative, past tense) | Latihan 2: Argumentative text E-Money | Latihan 3: Discussion text energi terbarukan (balanced)', criteria:'Apakah past tense digunakan konsisten dalam narasi? Apakah modal auxiliaries (should, must, can) digunakan dalam argumentasi? Apakah contrastive conjunctions (however, on the other hand) digunakan?' },
+      { num:3, label:'Rekam', icon:'🎤', desc:'Prompt: Speech tentang renewable energy ATAU cashless society — thesis + 2 argumen + recommendation (1.5-2 menit)', criteria:'Apakah struktur jelas dan kohesif? Apakah argumen didukung bukti/contoh? Apakah kesimpulan dan rekomendasi kuat? Apakah bahasa akademik digunakan?' },
+      { num:4, label:'Skenario', icon:'🎭', desc:'Skenario 1: Podcast argumentasi E-Money (cashless society) | Skenario 2: Narasi kisah Nayau + argumentasi energi terbarukan Indonesia', criteria:'Apakah siswa mampu menggabungkan narasi dan argumentasi? Apakah transisi antara bagian lancar? Apakah bahasa akademik dan persuasif digunakan dengan tepat?' }
     ]
   }
 };
@@ -277,39 +278,40 @@ async function loadRecordings(){
   const statusFilter  = document.getElementById('filter-status').value;
 
   try{
+    // Ambil SEMUA rekaman (bukan hanya current) agar dosen bisa lihat semua percobaan
     const params = { limit: 200 };
     if(levelId) params.level_id = levelId;
 
-    // "pending" dan "current" hanya ambil rekaman terbaru per siswa per level
-    if(statusFilter === 'pending' || statusFilter === 'current') {
-      params.current_only = 1;
-    }
-
     const r = await api.get('/recordings', params);
-    allRecordings = r.data.recordings;
+
+    // Hanya tampilkan rekaman MAIN (task_index null)
+    allRecordings = r.data.recordings.filter(rec => rec.task_index === null || rec.task_index === undefined || rec.task_index === '');
 
     // Load semua feedback
     const fbResp = await api.get('/feedback', { limit: 500 });
     feedbackMap  = {};
     fbResp.data.feedback.forEach(f=>{ feedbackMap[f.recording_id] = f; });
 
-    // Filter berdasarkan status
+    // Filter berdasarkan nama siswa
     let filtered = allRecordings;
     if(studentSearch) filtered = filtered.filter(r=>r.student_name.toLowerCase().includes(studentSearch));
+
+    // Filter berdasarkan status penilaian
     if(statusFilter === 'pending') filtered = filtered.filter(r=>!feedbackMap[r.id]);
 
     // Urutkan: belum dinilai dulu, lalu terbaru
     filtered.sort((a, b) => {
       const aHasFb = !!feedbackMap[a.id];
       const bHasFb = !!feedbackMap[b.id];
-      if(aHasFb !== bHasFb) return aHasFb ? 1 : -1; // belum dinilai di atas
-      return new Date(b.uploaded_at) - new Date(a.uploaded_at); // terbaru di atas
+      if(aHasFb !== bHasFb) return aHasFb ? 1 : -1;
+      return new Date(b.uploaded_at) - new Date(a.uploaded_at);
     });
 
     renderRecordings(filtered);
     filtered.forEach(rec => {
-      loadAudioBlob(rec.id);         // Step 3 main recording
-      loadTaskAudioBlobs(rec.id, rec.level_order || rec.level_id); // Step 2 task recordings
+      loadAudioBlob(rec.id);
+      loadTaskAudioBlobs(rec.id, rec.level_order || rec.level_id);
+      loadScenarioAudioBlobs(rec.id, rec.level_order || rec.level_id);
     });
   }catch(e){
     document.getElementById('rec-list').innerHTML = `<div class="empty-state" style="color:#c62828">Gagal memuat: ${e.message||'Error'}</div>`;
@@ -387,6 +389,12 @@ function renderRecordings(recs){
             <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:.75rem;margin-bottom:.6rem">
               <div style="font-size:.75rem;font-weight:700;color:#f57f17;margin-bottom:.35rem">🎤 PROMPT REKAMAN SISWA:</div>
               <div style="font-size:.88rem;color:#333;font-weight:600">"${content.recPrompt}"</div>
+            </div>
+            <div style="margin-bottom:.6rem">
+              <div style="font-size:.78rem;font-weight:700;color:#555;margin-bottom:.3rem">🎧 Audio Rekaman Siswa:</div>
+              <div id="audio-wrap-${rec.id}">
+                <div style="font-size:.8rem;color:#888">⏳ Memuat audio...</div>
+              </div>
             </div>`;
         } else if(s.num === 4 && content.scenarios){
           soalHtml = `
@@ -397,6 +405,11 @@ function renderRecordings(recs){
                   <div style="font-size:.75rem;font-weight:700;color:#2e7d32">Skenario ${i+1}: ${sc.tag}</div>
                   <div style="font-size:.83rem;color:#333;margin-top:.2rem">${sc.text}</div>
                 </div>`).join('')}
+              <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px dashed #a5d6a7">
+                <div style="font-size:.75rem;font-weight:700;color:#2e7d32;margin-bottom:.4rem">🎤 Rekaman Skenario Siswa:</div>
+                <div id="sc-audio-0-${rec.id}"><span style="font-size:.78rem;color:#888">⏳ Memuat Skenario 1...</span></div>
+                <div id="sc-audio-1-${rec.id}" style="margin-top:.3rem"><span style="font-size:.78rem;color:#888">⏳ Memuat Skenario 2...</span></div>
+              </div>
             </div>`;
         }
       }
@@ -404,6 +417,7 @@ function renderRecordings(recs){
       return `
       <div class="step-panel-dosen ${s.num===3?'active':''}" id="spanel-${rec.id}-${s.num}">
         ${soalHtml}
+        ${s.num === 3 && !content ? `<div style="margin-bottom:.6rem"><div style="font-size:.78rem;font-weight:700;color:#555;margin-bottom:.3rem">🎧 Audio Rekaman Siswa:</div><div id="audio-wrap-${rec.id}"><div style="font-size:.8rem;color:#888">⏳ Memuat audio...</div></div></div>` : ''}
         <div class="step-content-preview">${s.desc}</div>
         <div style="font-size:.8rem;color:#555;margin-bottom:.4rem;font-weight:600">📋 Kriteria Penilaian: <em style="font-weight:400">${s.criteria}</em></div>
         <div class="step-score">
@@ -422,15 +436,15 @@ function renderRecordings(recs){
         <span><strong>📚 Level ${levelNum}:</strong> ${topic}</span>
         <span><strong>📅 Diupload:</strong> ${fmtDate(rec.uploaded_at)}</span>
         <span><strong>📦 Ukuran:</strong> ${fmtSize(rec.file_size_bytes)}</span>
-        ${rec.is_current ? '<span style="background:#e3f2fd;color:#1565c0;padding:.2rem .55rem;border-radius:20px;font-size:.75rem;font-weight:600">🔄 Rekaman Terbaru</span>' : '<span style="background:#f5f5f5;color:#999;padding:.2rem .55rem;border-radius:20px;font-size:.75rem">📁 Rekaman Lama</span>'}
+        ${rec.is_current 
+          ? '<span style="background:#e3f2fd;color:#1565c0;padding:.2rem .55rem;border-radius:20px;font-size:.75rem;font-weight:600">🔄 Latihan Terbaru</span>' 
+          : '<span style="background:#f5f5f5;color:#999;padding:.2rem .55rem;border-radius:20px;font-size:.75rem">📁 Latihan Lama</span>'}
+        <span style="background:#fff3e0;color:#e65100;padding:.2rem .55rem;border-radius:20px;font-size:.75rem;font-weight:700">
+          🎤 Latihan ${['Pertama','Kedua','Ketiga'][((rec.attempt_number||1)-1)] || `ke-${rec.attempt_number||1}`}
+        </span>
         ${hasFb
           ? `<span class="badge ${fb.pass_status==='lulus'?'badge-lulus':'badge-tidak'}">${fb.pass_status==='lulus'?'✅ Lulus':'❌ Tidak Lulus'}</span>`
           : '<span class="badge badge-pending">⏳ Belum Dinilai</span>'}
-      </div>
-
-      <!-- Audio player -->
-      <div class="audio-wrap" id="audio-wrap-${rec.id}">
-        <div style="font-size:.8rem;color:#888;margin-bottom:.3rem">⏳ Memuat audio rekaman Step 3...</div>
       </div>
 
       <!-- Penilaian per step -->
@@ -486,23 +500,28 @@ function extractSummary(comment){
   return '';
 }
 
+// ── Deteksi base API path otomatis ───────────────────────────────────────────
+function getApiBase(){
+  const match = window.location.pathname.match(/^(\/[^/]+\/)/);
+  return match ? match[1].replace(/\/$/, '') + '/api' : '/api';
+}
+
 // ── Load audio via fetch (kirim JWT token) ────────────────────────────────────
 async function loadAudioBlob(recId){
   const wrap = document.getElementById(`audio-wrap-${recId}`);
   if(!wrap) return;
   try{
-    const token   = api.getAccessToken();
-    // Deteksi base URL sama seperti api.js
-    const basePath = window.location.pathname.startsWith('/speakon/') ? '/speakon/api' : '/api';
-    const streamUrl = `${basePath}/recordings/${recId}/stream`;
+    const token     = api.getAccessToken();
+    const streamUrl = `${getApiBase()}/recordings/${recId}/stream`;
 
     const resp = await fetch(streamUrl, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
     if(!resp.ok){
-      const errText = await resp.text().catch(()=>'');
-      wrap.innerHTML = `<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio (${resp.status}). ${errText}</div>`;
+      wrap.innerHTML = `<div style="color:#e65100;font-size:.82rem;padding:.4rem .6rem;background:#fff3e0;border-radius:6px;border-left:3px solid #ff9800">
+        ⚠️ File audio tidak tersedia (rekaman mungkin sudah dihapus dari server).
+      </div>`;
       return;
     }
 
@@ -517,13 +536,15 @@ async function loadAudioBlob(recId){
         Browser tidak mendukung audio player.
       </audio>`;
   }catch(e){
-    wrap.innerHTML = `<div style="color:#c62828;font-size:.82rem">⚠️ Gagal memuat audio: ${e.message}</div>`;
+    wrap.innerHTML = `<div style="color:#e65100;font-size:.82rem;padding:.4rem .6rem;background:#fff3e0;border-radius:6px;border-left:3px solid #ff9800">
+      ⚠️ Gagal memuat audio: ${e.message}
+    </div>`;
   }
 }
 
 // ── Load task audio recordings (Step 2) ──────────────────────────────────────
 async function loadTaskAudioBlobs(mainRecId, levelNum){
-  const basePath  = window.location.pathname.startsWith('/speakon/') ? '/speakon/api' : '/api';
+  const basePath  = getApiBase();
   const token     = api.getAccessToken();
   const content   = LEVEL_CONTENT[levelNum];
   const taskLabels = content?.tasks?.map(t => t.label) || ['Latihan 1','Latihan 2','Latihan 3'];
@@ -554,7 +575,7 @@ async function loadTaskAudioBlobs(mainRecId, levelNum){
         const resp = await fetch(`${basePath}/recordings/${taskRec.id}/stream`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if(!resp.ok){ wrap.innerHTML = `<div style="font-size:.78rem;color:#c62828">⚠️ Gagal load ${taskLabels[i]}</div>`; continue; }
+        if(!resp.ok){ wrap.innerHTML = `<div style="font-size:.78rem;color:#e65100;padding:.2rem .4rem;background:#fff3e0;border-radius:4px">⚠️ File audio tidak tersedia</div>`; continue; }
         const blob = await resp.blob();
         const url  = URL.createObjectURL(blob);
         wrap.innerHTML = `
@@ -569,6 +590,62 @@ async function loadTaskAudioBlobs(mainRecId, levelNum){
     }
   } catch(e) {
     console.warn('loadTaskAudioBlobs error:', e);
+  }
+}
+
+// ── Load scenario audio recordings (Step 4) ──────────────────────────────────
+// Skenario menggunakan task_index 10 dan 11
+async function loadScenarioAudioBlobs(mainRecId, levelNum){
+  const basePath    = getApiBase();
+  const token       = api.getAccessToken();
+  const content     = LEVEL_CONTENT[levelNum];
+  const scLabels    = content?.scenarios?.map(s => s.tag) || ['Skenario 1','Skenario 2'];
+  const SC_INDEXES  = [10, 11]; // task_index untuk skenario 1 dan 2
+
+  try {
+    const r = await api.get('/recordings', { limit: 200 });
+    const allRecs = r.data.recordings;
+    const mainRec = allRecs.find(rec => rec.id === mainRecId);
+    if(!mainRec) return;
+
+    for(let i = 0; i < 2; i++){
+      const wrap = document.getElementById(`sc-audio-${i}-${mainRecId}`);
+      if(!wrap) continue;
+
+      const scRec = allRecs.find(rec =>
+        rec.student_id === mainRec.student_id &&
+        rec.level_id   === mainRec.level_id &&
+        rec.task_index == SC_INDEXES[i] &&
+        rec.is_current == 1
+      );
+
+      if(!scRec){
+        wrap.innerHTML = `<div style="font-size:.78rem;color:#bbb;padding:.2rem 0">— ${scLabels[i]}: belum direkam</div>`;
+        continue;
+      }
+
+      try {
+        const resp = await fetch(`${basePath}/recordings/${scRec.id}/stream`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(!resp.ok){
+          wrap.innerHTML = `<div style="font-size:.78rem;color:#e65100;padding:.2rem .4rem;background:#fff3e0;border-radius:4px">⚠️ File audio tidak tersedia</div>`;
+          continue;
+        }
+        const blob = await resp.blob();
+        const url  = URL.createObjectURL(blob);
+        wrap.innerHTML = `
+          <div style="font-size:.75rem;font-weight:700;color:#2e7d32;margin-bottom:.2rem">${scLabels[i]}:</div>
+          <audio controls style="width:100%;height:34px;border-radius:5px">
+            <source src="${url}" type="audio/webm"/>
+            <source src="${url}" type="audio/ogg"/>
+          </audio>`;
+      } catch(e) {
+        wrap.innerHTML = `<div style="font-size:.78rem;color:#e65100">⚠️ ${e.message}</div>`;
+      }
+    }
+  } catch(e) {
+    console.warn('loadScenarioAudioBlobs error:', e);
   }
 }
 
